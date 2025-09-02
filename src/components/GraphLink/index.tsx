@@ -24,7 +24,7 @@ export default function GraphLink({ id, className, title, children }: Props) {
         requestFocus(id)
         if (appGraph && !appGraph.nodes.some(n => n.id === id)) 
             router.push(`/canvas?focus=${encodeURIComponent(id)}`)
-    }, [appGraph])
+    }, [appGraph, id, requestFocus, router])
 
     
 

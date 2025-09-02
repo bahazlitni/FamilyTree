@@ -5,11 +5,9 @@ import type {
 	AppGraph,
 	SearchIndex, 
 	ElkEdge, 
-	ElkNode,
-	PersonNodeData,
-	AppRole
+	ElkNode
 } from '@/types'
-import Graph from '@/lib/Graph'
+import Graph from '@/types/Graph'
 
 import ELK from 'elkjs/lib/elk.bundled.js'
 import type { Node, Edge } from 'reactflow'
@@ -17,7 +15,7 @@ import type {  } from '@/types'
 import { ELK_OPTIONS, NODE_W, NODE_H } from '@/lib/config'
 import { EPCID } from './utils'
 
-import Person from './Person'
+import Person from '@/types/Person'
 
 const elk = new ELK()
 
@@ -87,19 +85,18 @@ export default async function loadAppGraph(): Promise<AppGraph> {
         const member = graph.member(memberId)!
         const pos = idToPos.get(memberId) ?? { x: 0, y: 0 }
 
-		const data: PersonNodeData = {
-			person: member,
-			father: graph.fatherOf(memberId),
-			mother: graph.motherOf(memberId),
-			children: graph.childrenOf(memberId),
-			spouses: graph.spousesOf(memberId)
-		}
 
         nodes.push({
             id: memberId,
             type: 'person',
             position: pos,
-            data,
+            data: {
+                person: member,
+                father: graph.fatherOf(memberId),
+                mother: graph.motherOf(memberId),
+                children: graph.childrenOf(memberId),
+                spouses: graph.spousesOf(memberId)
+            },
             width: NODE_W,
             height: NODE_H,
         })

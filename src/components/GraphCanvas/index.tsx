@@ -1,7 +1,7 @@
 // @/components/GraphCanvas/index.tsx
 'use client'
 
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import React, { useCallback, useEffect, useRef, useState } from 'react'
 import ReactFlow, { Background, ReactFlowInstance } from 'reactflow'
 import 'reactflow/dist/style.css'
 
@@ -15,9 +15,25 @@ import { useTheme } from '@/contexts/ThemeContext'
 import { FiMoon, FiSun } from 'react-icons/fi'
 import PersonPanel from '../PersonPanel'
 import { AppGraph, PersonNodeData } from '@/types'
-import Link from 'next/link'
 import SignInButton from '../SignInButton'
 import SignOutButton from '../SignOutButton'
+import Graph from '@/types/Graph'
+
+const getAncestralElements = (graph: Graph, personId: string) => {
+    const ancestors = graph.ancestorsIdOf(personId)
+    const elements = new Set<string>(ancestors)
+
+    let lastAncestorId: string | undefined = ancestors.pop()
+    let currentAncestorId: string | undefined = ancestors.pop()
+
+    while(currentAncestorId && lastAncestorId){
+        elements.add(EPCID(lastAncestorId, currentAncestorId))
+        lastAncestorId = currentAncestorId
+        currentAncestorId = ancestors.pop()
+    }
+
+    return elements
+}
 
 function centerOnNode(rf: ReactFlowInstance, id: string, durationMs = 500, zoom = 1) {
     const node = rf.getNode(id)
@@ -29,7 +45,7 @@ function centerOnNode(rf: ReactFlowInstance, id: string, durationMs = 500, zoom 
 }
 
 export default function GraphCanvas({ appGraph }: { appGraph: AppGraph }) {
-    const { requestFocus, consumeFocus } = useFocus()
+    const { requestFocus } = useFocus()
     const searchParams = useSearchParams()
     const { theme, toggle } = useTheme()
 
@@ -52,8 +68,8 @@ export default function GraphCanvas({ appGraph }: { appGraph: AppGraph }) {
     useEffect(() => {
         if(!selectedPersonId || !rfRef.current) return
         centerOnNode(rfRef.current, selectedPersonId)
-        selectedData.current = (appGraph?.nodes.find((n) => n.id === selectedPersonId)?.data) as PersonNodeData ?? null
-    }, [selectedPersonId])
+        selectedData.current = appGraph.nodes.find((n) => n.id === selectedPersonId)?.data.data as PersonNodeData ?? null
+    }, [selectedPersonId, appGraph.nodes])
 
     const onInit = (inst: ReactFlowInstance) => {
         rfRef.current = inst
@@ -78,37 +94,21 @@ export default function GraphCanvas({ appGraph }: { appGraph: AppGraph }) {
 		}
 	}
 
-	const getAncestralElements = (personId: string) => {
-		let ancestors = appGraph.graph.ancestorsIdOf(personId)
-		let currentAncestorId: string | undefined = ancestors.pop()
-		const elements = new Set<string>()
 
-		while(currentAncestorId){
-			const currentChildId: string | undefined = ancestors.pop()
-			if(currentChildId)
-				elements.add(EPCID(currentAncestorId, currentChildId))
-			elements.add(currentAncestorId)
-			currentAncestorId = currentChildId
-		}
-
-		return elements
-	}
 
 	const highlightPerson = useCallback((personId: string) => {
-		const keep = selectedPersonId ? getAncestralElements(selectedPersonId) : new Set<string>()
 		addClassesToElements(
-			getAncestralElements(personId).difference(keep), 
+			getAncestralElements(appGraph.graph, personId).difference(keep.current), 
 			'is-highlighted'
 		)
-	}, [selectedPersonId])
+	}, [appGraph.graph])
 
 	const unhighlightPerson = useCallback((personId: string) => {
-		const keep = selectedPersonId ? getAncestralElements(selectedPersonId) : new Set<string>()
 		removeClassesFromElements(
-			getAncestralElements(personId).difference(keep), 
+			getAncestralElements(appGraph.graph, personId).difference(keep.current), 
 			'is-highlighted'
 		)
-	}, [selectedPersonId])
+	}, [appGraph.graph])
 
 
     return (
@@ -121,16 +121,16 @@ export default function GraphCanvas({ appGraph }: { appGraph: AppGraph }) {
                 </button>
                 {appGraph.role === null ? <SignInButton className='canvas-button'/> : <SignOutButton callbackURL='/canvas' className='canvas-button'/>}
             </div>
-            <PersonPanel
+            {selectedData.current && <PersonPanel
                 open={Boolean(selectedPersonId)}
                 data={selectedData.current}
                 onClose={() => {
                     if(selectedPersonId){
-                        removeClassesFromElements(getAncestralElements(selectedPersonId), 'is-highlighted', 'is-selected')
+                        removeClassesFromElements(getAncestralElements(appGraph.graph, selectedPersonId), 'is-highlighted', 'is-selected')
                         setSelectedPersonId(null)
                     }
                 }}
-            />
+            />}
             <ReactFlow
                 edgesFocusable={false}
                 edgesUpdatable={false}
@@ -155,10 +155,10 @@ export default function GraphCanvas({ appGraph }: { appGraph: AppGraph }) {
                 }}
                 onNodeClick={(_, n) => {
                     if(selectedPersonId)
-                        removeClassesFromElements(getAncestralElements(selectedPersonId), 'is-highlighted', 'is-selected')
+                        removeClassesFromElements(getAncestralElements(appGraph.graph, selectedPersonId), 'is-highlighted', 'is-selected')
 
                     if(appGraph.graph.has(n.id)){
-                        addClassesToElements(getAncestralElements(n.id), 'is-highlighted', 'is-selected')
+                        addClassesToElements(getAncestralElements(appGraph.graph, n.id), 'is-highlighted', 'is-selected')
                         setSelectedPersonId(n.id)
                     }
                     else 
@@ -166,7 +166,7 @@ export default function GraphCanvas({ appGraph }: { appGraph: AppGraph }) {
                 }}
                 onPaneClick={() => {
                     if(selectedPersonId){
-                        removeClassesFromElements(getAncestralElements(selectedPersonId), 'is-highlighted', 'is-selected')
+                        removeClassesFromElements(getAncestralElements(appGraph.graph, selectedPersonId), 'is-highlighted', 'is-selected')
                         setSelectedPersonId(null)
                     }
                 }}

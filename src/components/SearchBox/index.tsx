@@ -1,6 +1,6 @@
 'use client'
 
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { useCallback, useMemo, useRef, useState } from 'react'
 import { FiSearch } from 'react-icons/fi'
 import type { SearchIndex } from '@/types'
 import GraphLink from '@/components/GraphLink'
@@ -37,7 +37,7 @@ export default function SearchBox({
             )
         }
         setActive(results.length ? 0 : -1)
-    }, [appGraph])
+    }, [appGraph, results, limit])
 
     const onSearchClick = () => {
         const idx = active >= 0 ? active : 0

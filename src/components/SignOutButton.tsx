@@ -12,7 +12,7 @@ export default function SignOutButton({className, callbackURL}: {className?: str
 
     async function handleSignOut() {
         try {
-            setLoading(true);
+            setLoading(true)
             await supabase.auth.signOut()
             localStorage.removeItem('supabase.auth.token')
             router.replace(callbackURL)

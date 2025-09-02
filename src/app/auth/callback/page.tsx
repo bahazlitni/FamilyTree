@@ -19,7 +19,6 @@ export default function CallbackPage() {
   const [role, setRole] = useState<string | null>(null);
 
   useEffect(() => {
-    let done = false;
 
     (async () => {
       const url = new URL(window.location.href);
@@ -64,16 +63,11 @@ export default function CallbackPage() {
         // 4) Clean the URL (remove tokens/code)
         const clean = `${location.origin}/auth/callback`;
         window.history.replaceState({}, '', clean);
-        done = true;
       } else {
         // Still no session -> leave whatever error/status we set earlier
       }
     })();
-
-    return () => {
-      done = true;
-    };
-  }, []);
+  }, [supabase]);
 
   return (
     <main style={{ maxWidth: 480, margin: '48px auto', display: 'grid', gap: 12 }}>

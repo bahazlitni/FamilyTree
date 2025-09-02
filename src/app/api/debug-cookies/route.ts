@@ -27,12 +27,13 @@ export async function GET() {
 
   const session = decodeSupabaseCookie(authCookie.value);
   const accessToken = session.access_token;
-  const refreshToken = session.refresh_token;
+  // const refreshToken = session.refresh_token;
 
   const decoded = accessToken ? jwt.decode(accessToken, { complete: true }) : null;
 
   return NextResponse.json({
     cookieName: authCookie.name,
+
     session,
     decoded,
     payload: decoded && typeof decoded !== 'string' ? decoded.payload : null,

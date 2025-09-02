@@ -1,15 +1,15 @@
 'use client'
 
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useEffect, useMemo, useRef, useState, useCallback } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
 import styles from './styles.module.css'
 import type { PersonNodeData } from '@/types'
-import Person from '@/lib/Person'
-import { FiX, FiXSquare } from 'react-icons/fi'
+import Person from '@/types/Person'
+import { FiX } from 'react-icons/fi'
 
 export type PersonPanelProps = {
   open: boolean
-  data: PersonNodeData | null
+  data: PersonNodeData
   onClose: () => void
   // Optional: callbacks when clicking a related person chip
   onSelectPerson?: (p: Person) => void
@@ -20,7 +20,6 @@ function clamp(n: number, min: number, max: number) {
 }
 
 const nowYear = new Date().getFullYear()
-
 
 function ageFrom(person: Person) {
   if (!person) return null
@@ -43,29 +42,17 @@ export default function PersonPanel({
   onClose,
   onSelectPerson,
 }: PersonPanelProps) {
-    if(!data) return null
   // positioning
   const rootRef = useRef<HTMLDivElement | null>(null)
   const [pos, setPos] = useState<{ x: number; y: number }>({ x: 16, y: 16 })
   const dragStartRef = useRef<{ x: number; y: number; mx: number; my: number } | null>(null)
 
-  // restrict dragging to our "drag handles"
-  function onDragStart(e: React.MouseEvent<HTMLDivElement, MouseEvent>) {
-    const handle = (e.target as HTMLElement)?.closest('[data-drag-handle="true"]')
-    if (!handle) return
-    const root = rootRef.current
-    if (!root) return
-
-    const rect = root.getBoundingClientRect()
-    dragStartRef.current = { x: rect.left, y: rect.top, mx: e.clientX, my: e.clientY }
-    window.addEventListener('mousemove', onDragMove)
-    window.addEventListener('mouseup', onDragEnd)
-  }
-
-  function onDragMove(e: MouseEvent) {
+  // stable handlers
+  const onDragMove = useCallback((e: MouseEvent) => {
     const start = dragStartRef.current
     const root = rootRef.current
     if (!start || !root) return
+
     const dx = e.clientX - start.mx
     const dy = e.clientY - start.my
 
@@ -79,21 +66,35 @@ export default function PersonPanel({
     const nx = clamp(start.x + dx, 6, Math.max(6, vw - w - 6))
     const ny = clamp(start.y + dy, 6, Math.max(6, vh - h - 6))
     setPos({ x: nx, y: ny })
-  }
+  }, []) // refs and setState are stable
 
-  function onDragEnd() {
+  const onDragEnd = useCallback(() => {
     dragStartRef.current = null
     window.removeEventListener('mousemove', onDragMove)
     window.removeEventListener('mouseup', onDragEnd)
-  }
+  }, [onDragMove])
 
+  const onDragStart = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
+    const handle = (e.target as HTMLElement)?.closest('[data-drag-handle="true"]')
+    if (!handle) return
+    const root = rootRef.current
+    if (!root) return
+
+    const rect = root.getBoundingClientRect()
+    dragStartRef.current = { x: rect.left, y: rect.top, mx: e.clientX, my: e.clientY }
+    window.addEventListener('mousemove', onDragMove)
+    window.addEventListener('mouseup', onDragEnd)
+  }, [onDragMove, onDragEnd])
+
+  // unmount safety: always remove listeners
   useEffect(() => {
     return () => {
       window.removeEventListener('mousemove', onDragMove)
       window.removeEventListener('mouseup', onDragEnd)
     }
-  }, [])
+  }, [onDragMove, onDragEnd])
 
+  // esc to close
   useEffect(() => {
     function onKey(e: KeyboardEvent) {
       if (e.key === 'Escape') onClose()
@@ -104,15 +105,14 @@ export default function PersonPanel({
 
   const p = data.person
   const age = useMemo(() => ageFrom(p), [p])
-    const yearsLabel = useMemo(() => {
+  const yearsLabel = useMemo(() => {
     const b = p.birth_year ?? null
     const d = p.death_year ?? null
     if (b && d) return `${b} – ${d}`
     if (b && !d) return `${b}`
     if (!b && d) return `– ${d}`
     return null
-    }, [p])
-
+  }, [p])
 
   const hasParents = !!(data.father || data.mother)
   const hasSpouses = (data.spouses?.length ?? 0) > 0
@@ -142,7 +142,9 @@ export default function PersonPanel({
               <div className={styles.subTitle}>
                 <span className={styles.badge}>{genderLabel(p.is_male)}</span>
                 <span className={styles.dot} />
-                <span className={styles.badge}>{p.is_alive === true ? 'Alive' : p.is_alive === false ? 'Deceased' : 'Unknown'}</span>
+                <span className={styles.badge}>
+                  {p.is_alive === true ? 'Alive' : p.is_alive === false ? 'Deceased' : 'Unknown'}
+                </span>
                 {age != null && (
                   <>
                     <span className={styles.dot} />
@@ -247,7 +249,6 @@ export default function PersonPanel({
               </section>
             )}
           </div>
-
         </motion.aside>
       )}
     </AnimatePresence>

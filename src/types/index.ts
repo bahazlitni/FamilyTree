@@ -1,6 +1,7 @@
 // types/index.ts
-import Graph from '@/lib/Graph'
-import Person from '@/lib/Person'
+import Graph from '@/types/Graph'
+import Person from '@/types/Person'
+import { Edge, Node } from 'reactflow'
 export type AppRole = 'admin' | 'member' | null
 
 export type Theme = 'light' | 'dark'
@@ -44,12 +45,11 @@ export interface ChildLink {
 }
 
 
-/** Aggregated structure you already had is good */
 export type AppGraph = {
     role: AppRole
     graph: Graph
-	nodes: any[]
-	edges: any[]
+	nodes: Node[]
+	edges: Edge[]
     searchIndices: SearchIndex[]
 }
 
