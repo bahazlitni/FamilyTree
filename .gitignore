@@ -17,4 +17,5 @@ node_modules/
 # editor settings
 .vscode/
 
+new-ticket.bat
 ticket.txt
