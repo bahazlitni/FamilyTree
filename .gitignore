@@ -1,11 +1,17 @@
-node_modules
+# dependencies
+node_modules/
 
+# env files
 .env
+.env.*
+
+# misc
 *.txt
-.*
 *.bat
 
+# build artifacts
 *.exe
 *.dll
 
+# editor settings
 .vscode/
