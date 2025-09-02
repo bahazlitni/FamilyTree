@@ -1,23 +1,12 @@
 node_modules
 
+.env
 *.txt
 .*
 *.bat
 *.gitignore
 
-build/
-dist/
-*.spec
-.upx/
-*.onefile-build/
-*.exe     # produced exe; we’ll attach it in Releases instead
+*.exe
 *.dll
 
-# IDEs ----------------------------------------------------------------
 .vscode/
-.idea/
-.PyCharm*
-
-# OS -----------------------------------------------------------------
-.DS_Store
-Thumbs.db
