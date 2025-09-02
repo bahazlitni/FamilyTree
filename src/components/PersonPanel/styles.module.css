@@ -1,0 +1,245 @@
+.panel {
+  position: fixed;
+  width: 360px;
+  max-height: 92vh;
+  overflow: auto;
+  background: var(--panel);
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: 12px; /* slightly softer */
+  box-shadow: 0 12px 34px var(--shadow);
+  z-index: 20;
+  display: flex;
+  flex-direction: column;
+}
+
+
+.header {
+  display: flex;
+  align-items: start;
+  justify-content: space-between;
+  padding: 12px 14px;
+  background: color-mix(in oklab, var(--panel), black 6%);
+  cursor: grab;
+  user-select: none;
+}
+
+.titleBlock {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+.title {
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: .2px;
+  line-height: 1.2;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.subTitle {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 6px;
+  font-size: 12px;
+  color: var(--text-muted);
+}
+.badge {
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  padding: 2px 8px;
+  font-size: 11px;
+  line-height: 1;
+}
+.dot {
+  width: 4px;
+  height: 4px;
+  border-radius: 999px;
+  background: var(--text-muted);
+  display: inline-block;
+}
+
+.close {
+  background: transparent;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  aspect-ratio: 1/1;
+  padding: 2px 8px;
+  color: var(--text);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+.close:hover {
+  background: color-mix(in oklab, var(--panel), white 6%);
+}
+
+.content {
+  padding: 10px 12px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  border: 1px dashed color-mix(in oklab, var(--border), white 10%);
+  border-radius: 10px;
+  padding: 10px;
+}
+
+.sectionHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.sectionTitle {
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--text);
+}
+.count {
+  font-size: 11px;
+  color: var(--text-muted);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  padding: 2px 6px;
+  line-height: 1;
+}
+
+.kv {
+  display: grid;
+  grid-template-columns: 96px 1fr;
+  gap: 10px;
+  align-items: baseline;
+}
+.label {
+  font-size: 12px;
+  color: var(--text-muted);
+}
+.value {
+  font-size: 12.5px;
+  color: var(--text);
+  word-break: break-word;
+}
+
+/* Person chips */
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 8px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: color-mix(in oklab, var(--panel), white 4%);
+  cursor: pointer;
+}
+.chip:hover {
+  background: color-mix(in oklab, var(--panel), white 8%);
+}
+.chipAvatar {
+  width: 18px;
+  height: 18px;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  display: grid;
+  place-items: center;
+  font-size: 11px;
+}
+.chipText {
+  font-size: 12.5px;
+}
+.chipMeta {
+  font-size: 11px;
+  color: var(--text-muted);
+  padding-left: 4px;
+}
+
+/* Children list */
+.childList {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  max-height: 240px;
+  overflow: auto;
+  border-radius: 8px;
+  border: 1px solid color-mix(in oklab, var(--border), white 10%);
+}
+.childRow {
+  width: 100%;
+  display: grid;
+  grid-template-columns: 26px 1fr auto;
+  gap: 8px;
+  align-items: center;
+  padding: 8px 10px;
+  background: transparent;
+  border: none;
+  text-align: left;
+  cursor: pointer;
+}
+.childRow:hover {
+  background: color-mix(in oklab, var(--panel), white 6%);
+}
+.childAvatar {
+  width: 24px;
+  height: 24px;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  display: grid;
+  place-items: center;
+  font-size: 12px;
+}
+.childName {
+  font-size: 12.5px;
+}
+.childMeta {
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+
+/* Ensure theme colors apply everywhere inside the panel */
+.panel {
+  color: var(--text);
+}
+
+.panel * {
+  color: inherit;
+}
+
+/* Buttons default to black text in many browsers – force inherit */
+.panel button {
+  color: inherit;
+}
+
+/* Your chips and rows use buttons too – keep them inheriting text */
+.chip,
+.childRow {
+  color: inherit;
+}
+
+/* Optional: soften placeholder borders in dark mode a bit */
+.chip,
+.childRow,
+.badge {
+  border-color: var(--border);
+}
+
+/* If you use links inside the panel later */
+.panel a {
+  color: inherit;
+  text-decoration-color: color-mix(in oklab, var(--text), transparent 60%);
+}
+.panel a:hover {
+  text-decoration-color: var(--text);
+}

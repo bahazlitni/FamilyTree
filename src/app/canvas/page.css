@@ -1,0 +1,114 @@
+/* /canvas/page.css */
+
+.canvas {
+    width: 100vw;
+    height: 100vh;
+    background: var(--bg);
+    color: var(--text);
+    position: relative;
+}
+
+.canvas-sign-in-flare {
+    position: fixed;
+    bottom: 32px;
+    transform: translateX(-50%);
+    left: 50%;
+    display: inline-flex;
+    align-items: center;
+    z-index: 1000;
+}
+.canvas-sign-in-link {
+    font-weight: bolder;
+}
+
+/* toolbar (top-right) */
+.canvas-toolbar {
+    position: absolute;
+    right: 24px;
+    top: 16px;
+    z-index: 5;
+    display: flex;
+    gap: 8px;
+}
+
+.canvas-button {
+    border: 1px solid var(--border);
+    background: var(--panel);
+    color: var(--text);
+    padding: 6px 10px;
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    box-shadow: 0 6px 18px var(--shadow);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.canvas-button:disabled {
+    opacity: 0.6;
+    cursor: default;
+}
+
+
+/* loading/error states */
+.canvas-state {
+    width: 100vw;
+    height: 100vh;
+    display: grid;
+    place-items: center;
+    gap: 12px;
+    background: var(--bg);
+    font-size: 12px;
+    color: var(--text-muted);
+}
+
+
+.rf-node {
+  display: flex;
+  flex-direction: column;
+  padding: 14px;
+  background-color: var(--person-bg);
+  border: solid 1px var(--border);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+}
+
+/* bidi-safe text */
+.rf-node p {
+  direction: auto;
+  unicode-bidi: plaintext;
+}
+
+.rf-node .fullname { font-size: 16px; font-weight: bolder; }
+.rf-node .lifespan { font-size: 12px; color: var(--text-dim); text-align: center; }
+.rf-node .spouses  { margin-top: 4px; font-size: 12px; color: var(--text-muted); }
+
+/* ✅ state on the same element, not a child */
+.rf-node.is-highlighted {
+  outline: 2px solid var(--accent);
+  outline-offset: 0;
+}
+.rf-node.is-selected {
+  outline: 2px solid var(--primary);
+  outline-offset: 0;
+}
+
+/* edges */
+.rf-edge {
+  stroke: var(--text-dim);
+  stroke-width: 1px;
+  pointer-events: none;
+}
+
+/* ✅ same fix: state class on the same element */
+.rf-edge.is-highlighted {
+  stroke-dasharray: 10 10;
+  animation: dashmove 1s linear infinite;
+  stroke: var(--accent);
+  stroke-width: 3px;
+}
+.rf-edge.is-selected {
+  stroke: var(--primary) !important;
+  stroke-width: 3px;
+}
+@keyframes dashmove { to { stroke-dashoffset: -20 } }
+

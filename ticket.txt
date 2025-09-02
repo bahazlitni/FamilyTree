@@ -1,0 +1,46 @@
+'''
+USING WINDOWS, NEXT JS LATEST, TYPESCRIPT, ESLINT
+TICKET-ID: 20250902-220240
+TITLE: 
+
+TASK:
+[-] Debugging
+[-] Refactoring
+[-] Optimization
+[-] Simplification
+[-] Cleaning
+[-] Redesigning
+[-] Suggesting Changes
+[+] Other
+
+OPTIONS:
+[+] Provide entire code solutions
+[-] No comments, else only when necessary
+[+] Keep same syntax style
+[+] Ask before assuming anything
+[+] Use best practices
+[+] Keep general behavior unchanged
+
+CONTEXT:
+
+CODE:
+
+GLOBAL:
+
+GOAL:
+
+NOTES:
+
+PROJECT-STRUCTURE:
+README.md
+eslint.config.mjs
+next.config.ts
+package-lock.json
+package.json
+src/app/favicon.ico
+src/app/globals.css
+src/app/layout.tsx
+src/app/page.module.css
+src/app/page.tsx
+tsconfig.json
+''' 
