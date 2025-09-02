@@ -4,7 +4,6 @@ node_modules
 *.txt
 .*
 *.bat
-*.gitignore
 
 *.exe
 *.dll
