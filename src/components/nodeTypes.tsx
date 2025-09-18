@@ -42,12 +42,12 @@ const PersonBaseNode = ({ data }: { data: PersonView }) => {
    // --- Compute kinship label (only for *picked* main-effect nodes)
    let kinLabel: string | null = null
    if (
-      ui.pickedIds.length === 2 &&
-      ui.pickedIds.includes(person.id) &&
+      ui.pickedA &&
+      ui.pickedB &&
+      (ui.pickedA === person.id || ui.pickedB === person.id) &&
       appGraph?.graph
    ) {
-      const [a, b] = ui.pickedIds
-      const other = person.id === a ? b : a
+      const other = person.id === ui.pickedA ? ui.pickedB : ui.pickedA
       const key = relationKeyAtoB(appGraph.graph, person.id, other)
       kinLabel = tKin(key as any)
    }

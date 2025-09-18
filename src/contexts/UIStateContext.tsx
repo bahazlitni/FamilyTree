@@ -11,6 +11,7 @@ import React, {
 
 type ID = string
 export type UIMode = 'default' | 'picking'
+export type Slot = 'A' | 'B'
 
 // Final CSS classes we will apply (mutually exclusive)
 export const UI_FINAL_CLASSES = {
@@ -25,7 +26,13 @@ type UIState = {
 
    // Main-effects (override everything)
    selectedId: ID | null // one
-   pickedIds: ID[] // FIFO max 2
+
+   // Designated A/B slots (replaces FIFO array)
+   pickedA: ID | null
+   pickedB: ID | null
+
+   // Which slot graph clicks will fill while in "picking" mode
+   pickingTarget: Slot
 
    // Side-effects (selection) – ancestors of selected node (nodes + edges)
    selectionSide: ReadonlySet<ID>
@@ -47,17 +54,23 @@ type Action =
    | { type: 'HOVER_DEFAULT_LEAVE' }
    | { type: 'HOVER_PICKING_ENTER'; id: ID }
    | { type: 'HOVER_PICKING_LEAVE' }
-   | { type: 'PICK'; id: ID } // main
+   | { type: 'PICK_SLOT'; slot: Slot; id: ID } // designated slot fill
+   | { type: 'SET_PICKING_TARGET'; slot: Slot }
    | { type: 'RESET_PICKS' }
    | { type: 'SET_PICKING_SIDE'; ids: ReadonlySet<ID> }
 
 const initialState: UIState = {
    mode: 'default',
    selectedId: null,
-   pickedIds: [],
+
+   pickedA: null,
+   pickedB: null,
+   pickingTarget: 'A',
+
    selectionSide: new Set(),
    pickingSide: new Set(),
    pickingSideEdges: new Set(),
+
    hoverHighlight: new Set(),
    hoverPickHighlight: new Set(),
 }
@@ -94,7 +107,10 @@ function reducer(state: UIState, action: Action): UIState {
             ...state,
             selectedId: action.id,
             selectionSide: new Set(action.side),
-            pickedIds: [],
+
+            // clear picks when selecting a single person
+            pickedA: null,
+            pickedB: null,
             pickingSide: new Set(),
             pickingSideEdges: new Set(),
             hoverHighlight: new Set(),
@@ -116,6 +132,7 @@ function reducer(state: UIState, action: Action): UIState {
             hoverPickHighlight: new Set(),
          }
       }
+
       case 'HOVER_DEFAULT_LEAVE': {
          if (state.hoverHighlight.size === 0) return state
          return { ...state, hoverHighlight: new Set() }
@@ -130,44 +147,43 @@ function reducer(state: UIState, action: Action): UIState {
             hoverHighlight: new Set(),
          }
       }
+
       case 'HOVER_PICKING_LEAVE': {
          if (state.hoverPickHighlight.size === 0) return state
          return { ...state, hoverPickHighlight: new Set() }
       }
 
-      case 'PICK': {
-         // FIFO max-2 without duplicates
-         const cur = state.pickedIds.slice()
-         if (!cur.includes(action.id)) {
-            cur.push(action.id)
-            if (cur.length > 2) cur.shift()
-         }
-         if (
-            cur.length === state.pickedIds.length &&
-            cur.every((v, i) => v === state.pickedIds[i])
-         ) {
-            return state
-         }
+      case 'PICK_SLOT': {
+         if (action.slot === 'A' && state.pickedA === action.id) return state
+         if (action.slot === 'B' && state.pickedB === action.id) return state
          return {
             ...state,
             selectedId: null,
             selectionSide: new Set(),
             hoverHighlight: new Set(),
             hoverPickHighlight: new Set(),
-            pickedIds: cur,
+            pickedA: action.slot === 'A' ? action.id : state.pickedA,
+            pickedB: action.slot === 'B' ? action.id : state.pickedB,
          }
+      }
+
+      case 'SET_PICKING_TARGET': {
+         if (state.pickingTarget === action.slot) return state
+         return { ...state, pickingTarget: action.slot }
       }
 
       case 'RESET_PICKS': {
          if (
-            state.pickedIds.length === 0 &&
+            !state.pickedA &&
+            !state.pickedB &&
             state.pickingSide.size === 0 &&
             state.pickingSideEdges.size === 0
          )
             return state
          return {
             ...state,
-            pickedIds: [],
+            pickedA: null,
+            pickedB: null,
             pickingSide: new Set(),
             pickingSideEdges: new Set(),
          }
@@ -203,8 +219,9 @@ type UIActions = {
    hoverPickingEnter: (id: ID) => void
    hoverPickingLeave: () => void
 
-   // picking
-   pick: (id: ID) => void
+   // picking (slot-aware)
+   pickSlot: (slot: Slot, id: ID) => void
+   setPickingTarget: (slot: Slot) => void
    resetPicks: () => void
    setPickingSideEffects: (ids: ReadonlySet<ID>) => void
 
@@ -249,7 +266,14 @@ export function UIStateProvider({ children }: { children: ReactNode }) {
       []
    )
 
-   const pick = useCallback((id: ID) => dispatch({ type: 'PICK', id }), [])
+   const pickSlot = useCallback(
+      (slot: Slot, id: ID) => dispatch({ type: 'PICK_SLOT', slot, id }),
+      []
+   )
+   const setPickingTarget = useCallback(
+      (slot: Slot) => dispatch({ type: 'SET_PICKING_TARGET', slot }),
+      []
+   )
    const resetPicks = useCallback(() => dispatch({ type: 'RESET_PICKS' }), [])
    const setPickingSideEffects = useCallback(
       (ids: ReadonlySet<ID>) => dispatch({ type: 'SET_PICKING_SIDE', ids }),
@@ -259,8 +283,9 @@ export function UIStateProvider({ children }: { children: ReactNode }) {
    // resolver (priority rules)
    const resolveClass = useCallback(
       (id: ID): string | null => {
-         // main-effects
-         if (state.pickedIds.includes(id)) return UI_FINAL_CLASSES.picked
+         // main-effects (picked)
+         if (state.pickedA === id || state.pickedB === id)
+            return UI_FINAL_CLASSES.picked
          if (state.selectedId === id) return UI_FINAL_CLASSES.selected
 
          // hover effects
@@ -278,7 +303,8 @@ export function UIStateProvider({ children }: { children: ReactNode }) {
          return null
       },
       [
-         state.pickedIds,
+         state.pickedA,
+         state.pickedB,
          state.selectedId,
          state.hoverPickHighlight,
          state.hoverHighlight,
@@ -297,7 +323,8 @@ export function UIStateProvider({ children }: { children: ReactNode }) {
          hoverDefaultLeave,
          hoverPickingEnter,
          hoverPickingLeave,
-         pick,
+         pickSlot,
+         setPickingTarget,
          resetPicks,
          setPickingSideEffects,
          resolveClass,
@@ -310,7 +337,8 @@ export function UIStateProvider({ children }: { children: ReactNode }) {
          hoverDefaultLeave,
          hoverPickingEnter,
          hoverPickingLeave,
-         pick,
+         pickSlot,
+         setPickingTarget,
          resetPicks,
          setPickingSideEffects,
          resolveClass,

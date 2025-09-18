@@ -161,7 +161,8 @@ export default function GraphCanvas({ appGraph }: { appGraph: AppGraph }) {
       hoverDefaultLeave,
       hoverPickingEnter,
       hoverPickingLeave,
-      pick,
+      pickSlot,
+      setPickingTarget,
       setPickingSideEffects,
    } = useUIActions()
 
@@ -193,7 +194,7 @@ export default function GraphCanvas({ appGraph }: { appGraph: AppGraph }) {
 
       const side = getAncestralElements(graph, id)
       select(id, side)
-   }, [personView, appGraph, ui, clearSelection])
+   }, [personView, appGraph, ui, clearSelection, select])
 
    // Center on selection (camera zoom 1)
    useEffect(() => {
@@ -208,18 +209,27 @@ export default function GraphCanvas({ appGraph }: { appGraph: AppGraph }) {
       }
    }, [ui.selectedId, rf, nodesInitialized])
 
-   // Compute kinship side-effects when two picks exist
+   // Compute kinship side-effects when both slots exist
    useEffect(() => {
-      if (ui.pickedIds.length === 2) {
-         const [a, b] = ui.pickedIds
-         const path = kinshipPathElements(appGraph.graph, a, b)
+      if (ui.pickedA && ui.pickedB) {
+         const path = kinshipPathElements(
+            appGraph.graph,
+            ui.pickedA,
+            ui.pickedB
+         )
          if (!setsEqual(path, ui.pickingSide)) {
             setPickingSideEffects(path)
          }
       } else if (ui.pickingSide.size) {
          setPickingSideEffects(new Set())
       }
-   }, [ui.pickedIds, ui.pickingSide, appGraph.graph, setPickingSideEffects])
+   }, [
+      ui.pickedA,
+      ui.pickedB,
+      ui.pickingSide,
+      appGraph.graph,
+      setPickingSideEffects,
+   ])
 
    const handleFit = useCallback(
       () => rf?.fitView({ padding: 0.2, duration: 300 }),
@@ -256,10 +266,28 @@ export default function GraphCanvas({ appGraph }: { appGraph: AppGraph }) {
          if (!appGraph.graph.has(n.id)) return
          if (evt.metaKey || evt.ctrlKey) return // do nothing with meta in either mode
 
-         if (ui.mode === 'picking') pick(n.id)
-         else requestFocus(n.id)
+         if (ui.mode === 'picking') {
+            const slot = ui.pickingTarget // 'A' | 'B'
+            pickSlot(slot, n.id)
+
+            // Optional UX: auto-switch target to the other slot if empty
+            if (slot === 'A' && !ui.pickedB) setPickingTarget('B')
+            else if (slot === 'B' && !ui.pickedA) setPickingTarget('A')
+         } else {
+            // default behavior: focus
+            requestFocus(n.id)
+         }
       },
-      [ui.mode, appGraph.graph, pick, requestFocus]
+      [
+         ui.mode,
+         ui.pickingTarget,
+         ui.pickedA,
+         ui.pickedB,
+         appGraph.graph,
+         pickSlot,
+         setPickingTarget,
+         requestFocus,
+      ]
    )
 
    const onPaneClick = useCallback(() => {

@@ -28,16 +28,20 @@ type Props = {
    className?: string
    placeholder?: string
    disabled?: boolean
-   value?: string // selected id (optional)
+   /** Selected id (for app state) */
+   value?: string
    defaultValue?: string
+   /** Visible text controller (separate from selected id) */
+   inputValue?: string
    onSelect?: (id?: string) => void
    onSearch?: (q: string) => ComboboxItem[]
    onChange?: (e: ChangeEvent<HTMLInputElement>) => void
-   /** If true, each row is a <GraphLink id=...>{item.searchBy}</GraphLink>.
-    *  If false, it’s plain text in a <button>. */
+   /** If true, rows render as <GraphLink>. Else, plain text buttons. */
    wrapWithGraphLink?: boolean
-   /** if true: clicking outside clears selection (calls onSelect(undefined)) */
+   /** If true, clicking outside clears selection via onSelect(undefined) */
    clearOnOutside?: boolean
+   /** If true, selecting sets the input text to item.searchBy ?? item.label */
+   changeValueOnSelect?: boolean
    /** aria ids */
    listboxId?: string
 } & Omit<
@@ -55,11 +59,13 @@ const HeadlessCombobox = forwardRef<
       disabled,
       value,
       defaultValue,
+      inputValue,
       onSelect,
       onSearch,
       onChange,
       wrapWithGraphLink = false,
       clearOnOutside = true,
+      changeValueOnSelect = false,
       listboxId = 'combobox-list',
       ...rest
    } = props
@@ -90,6 +96,33 @@ const HeadlessCombobox = forwardRef<
       () => wrapRef.current
    )
 
+   // keep input always controlled via innerText
+   const [innerText, setInnerText] = useState<string>('')
+
+   // mirror parent-controlled text when provided
+   useEffect(() => {
+      if (inputValue !== undefined) {
+         setInnerText(inputValue)
+      }
+   }, [inputValue])
+
+   // selecting an item optionally writes its text into the input
+   const applyInputValueFromItem = useCallback(
+      (item: ComboboxItem) => {
+         if (!changeValueOnSelect) return
+         const text = item.searchBy ?? item.label
+         if (inputValue === undefined) {
+            // locally controlled text
+            setInnerText(text)
+            onChange?.({ target: { value: text } } as any)
+         } else {
+            // parent-controlled text
+            onChange?.({ target: { value: text } } as any)
+         }
+      },
+      [changeValueOnSelect, inputValue, onChange]
+   )
+
    // outside click
    useEffect(() => {
       if (!open && !clearOnOutside) return
@@ -100,12 +133,15 @@ const HeadlessCombobox = forwardRef<
             setOpen(false)
             setItems([])
             setActive(-1)
-            if (clearOnOutside) setSelected(undefined)
+            if (clearOnOutside) {
+               setSelected(undefined)
+               if (inputValue === undefined) setInnerText('')
+            }
          }
       }
       document.addEventListener('mousedown', onDoc, true)
       return () => document.removeEventListener('mousedown', onDoc, true)
-   }, [open, clearOnOutside, setSelected])
+   }, [open, clearOnOutside, inputValue])
 
    // keyboard
    const onKeyDown = useCallback(
@@ -124,8 +160,9 @@ const HeadlessCombobox = forwardRef<
          } else if (e.key === 'Enter') {
             e.preventDefault()
             if (active >= 0 && active < items.length) {
-               const id = items[active].id
-               setSelected(id)
+               const item = items[active]
+               setSelected(item.id)
+               applyInputValueFromItem(item)
                setOpen(false)
                setItems([])
                setActive(-1)
@@ -137,7 +174,7 @@ const HeadlessCombobox = forwardRef<
             setActive(-1)
          }
       },
-      [open, items, active, setSelected]
+      [open, items, active, applyInputValueFromItem]
    )
 
    // imperative
@@ -157,7 +194,8 @@ const HeadlessCombobox = forwardRef<
             {...rest}
             dir={locale === 'ar' ? 'rtl' : 'ltr'}
             ref={mergedRef}
-            value={value}
+            // always controlled: either parent-provided text or our buffer
+            value={inputValue ?? innerText}
             disabled={disabled}
             placeholder={placeholder}
             className="control"
@@ -167,7 +205,7 @@ const HeadlessCombobox = forwardRef<
             onClick={() => {
                setOpen((o) => !o)
                if (!open && onSearch) {
-                  const v = inputRef.current?.value ?? ''
+                  const v = inputValue ?? innerText ?? ''
                   setItems(onSearch(v))
                   setActive(0)
                   requestAnimationFrame(recompute)
@@ -176,6 +214,9 @@ const HeadlessCombobox = forwardRef<
             onKeyDown={onKeyDown}
             onChange={(e) => {
                onChange?.(e)
+               if (inputValue === undefined) {
+                  setInnerText(e.target.value)
+               }
                if (!open) setOpen(true)
                if (onSearch) {
                   setItems(onSearch(e.target.value))
@@ -201,6 +242,7 @@ const HeadlessCombobox = forwardRef<
 
                   const handleAction = () => {
                      setSelected(it.id)
+                     applyInputValueFromItem(it)
                      setOpen(false)
                      setItems([])
                      setActive(-1)
@@ -225,12 +267,9 @@ const HeadlessCombobox = forwardRef<
                               }`}
                               onMouseMove={() => setActive(i)}
                               onClick={() => {
-                                 // For SearchBox-style behavior, close after navigating.
                                  setOpen(false)
                                  setItems([])
                                  setActive(-1)
-                                 // Typically you won't call onSelect here, but if you want, uncomment:
-                                 // setSelected(it.id)
                               }}
                            >
                               {text}
