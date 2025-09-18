@@ -193,7 +193,7 @@ export default function GraphCanvas({ appGraph }: { appGraph: AppGraph }) {
 
       const side = getAncestralElements(graph, id)
       select(id, side)
-   }, [personView, appGraph, ui])
+   }, [personView, appGraph, ui, clearSelection])
 
    // Center on selection (camera zoom 1)
    useEffect(() => {
@@ -259,7 +259,7 @@ export default function GraphCanvas({ appGraph }: { appGraph: AppGraph }) {
          if (ui.mode === 'picking') pick(n.id)
          else requestFocus(n.id)
       },
-      [ui.mode, appGraph.graph, pick, select, requestFocus]
+      [ui.mode, appGraph.graph, pick, requestFocus]
    )
 
    const onPaneClick = useCallback(() => {

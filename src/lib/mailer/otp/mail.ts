@@ -48,16 +48,5 @@ export async function sendMail(input: SendMailOptions) {
          }>`,
    })
 
-   // For local/dev visibility
-   if (process.env.NODE_ENV !== 'production') {
-      try {
-         // @ts-ignore nodemailer provides preview for ethereal/email-stub transports
-         // eslint-disable-next-line @typescript-eslint/no-var-requires
-         const getTestMessageUrl = require('nodemailer').getTestMessageUrl
-         const url = getTestMessageUrl?.(info)
-         if (url) console.log('Preview URL:', url)
-      } catch {}
-   }
-
    return info
 }

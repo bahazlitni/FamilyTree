@@ -73,7 +73,8 @@
       "fit": "ajuster",
       "retry": "réessayer",
       "or": "ou",
-      "error": "erreur"
+      "error": "erreur",
+      "click-me": "cliquez-moi"
    },
 
    "canvas": {

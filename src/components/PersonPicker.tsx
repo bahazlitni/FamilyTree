@@ -42,13 +42,12 @@ export default function PersonPicker({
 
    useEffect(() => {
       onPicking?.(pendingExternal)
-   }, [pendingExternal])
+   }, [pendingExternal, onPicking])
 
    useEffect(() => {
       if (!graph || !pendingExternal) return
 
       const onDoc = (e: MouseEvent) => {
-         let n = e.target as HTMLElement | null
          let id: string | undefined
 
          const el = (e.target as HTMLElement)?.closest<HTMLElement>(

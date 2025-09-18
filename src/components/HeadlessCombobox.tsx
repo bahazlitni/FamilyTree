@@ -105,7 +105,7 @@ const HeadlessCombobox = forwardRef<
       }
       document.addEventListener('mousedown', onDoc, true)
       return () => document.removeEventListener('mousedown', onDoc, true)
-   }, [open, clearOnOutside])
+   }, [open, clearOnOutside, setSelected])
 
    // keyboard
    const onKeyDown = useCallback(
@@ -137,7 +137,7 @@ const HeadlessCombobox = forwardRef<
             setActive(-1)
          }
       },
-      [open, items, active]
+      [open, items, active, setSelected]
    )
 
    // imperative
@@ -213,7 +213,6 @@ const HeadlessCombobox = forwardRef<
                         className={`control ${isActive ? 'active' : ''} ${
                            isSelected ? 'selected' : ''
                         }`}
-                        aria-selected={isSelected}
                         onMouseMove={() => setActive(i)}
                         onClick={handleAction}
                      >
