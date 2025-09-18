@@ -1,0 +1,29 @@
+/* /styles/variants/control.dropdown.css */
+@layer variants {
+   .control[data-variant='dropdown'] {
+      display: flex;
+      flex-direction: column;
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      overflow-y: auto;
+      width: 100%;
+      min-width: fit-content;
+      z-index: 1000;
+      position: absolute;
+      left: 0;
+      color: var(--c-fg);
+   }
+
+   .control[data-variant='dropdown'].drop-down {
+      top: 100%;
+      margin-top: 4px;
+      box-shadow: 0 4px 8px var(--shadow);
+   }
+
+   .control[data-variant='dropdown'].drop-up {
+      bottom: 100%;
+      margin-bottom: 4px;
+      box-shadow: 0 -4px 8px var(--shadow);
+   }
+}

@@ -1,0 +1,38 @@
+/* /styles/components/reactflow.node.css */
+@layer components {
+   .rf-node {
+      outline-width: 2px;
+      outline-style: solid;
+      outline-color: var(--border);
+      border-radius: var(--radius);
+      background: var(--panel);
+      color: var(--text);
+      padding: 10px 12px;
+      position: relative;
+      cursor: pointer;
+   }
+
+   .rf-node .fullname {
+      font-weight: 600;
+      font-size: 14px;
+      color: var(--text);
+      margin-bottom: 2px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+   }
+
+   .rf-node .lifespan {
+      font-size: 12px;
+      color: var(--text-muted);
+      margin-bottom: 4px;
+   }
+
+   .rf-node .spouses {
+      font-size: 12px;
+      color: var(--text-dim);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+   }
+}

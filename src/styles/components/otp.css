@@ -1,0 +1,48 @@
+@layer components {
+   .otp {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      position: relative;
+      overflow: visible;
+      height: fit-content;
+      width: 100%;
+      pointer-events: all;
+   }
+
+   .otp ol {
+      display: flex;
+      flex-direction: row;
+      align-self: center;
+      justify-content: space-between;
+      align-items: center;
+      justify-self: center;
+      width: 100%;
+      min-width: fit-content;
+      direction: ltr;
+   }
+   .otp input {
+      direction: ltr;
+
+      width: 100%;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      font-size: 24px;
+      outline: none;
+      border: none;
+      position: absolute;
+      inset: 0;
+      color: inherit;
+      background-color: transparent;
+      z-index: 1;
+   }
+   .otp .bottom {
+      display: flex;
+      flex-direction: row;
+      justify-content: space-between;
+      width: 100%;
+   }
+}

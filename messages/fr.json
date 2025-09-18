@@ -1,0 +1,165 @@
+{
+   "auth": {
+      "OTP": {
+         "sent-to": "Nous avons envoyé un code OTP à <strong>{email}</strong>.",
+         "label": "Entrez le code OTP",
+         "resend": {
+            "resend-code": "Renvoyer le code",
+            "resend-in-n-seconds": "Renvoyer dans {n}s",
+            "success": "Code envoyé avec succès.",
+            "case-400": "Entrée invalide. Vérifiez vos données.",
+            "case-401": "Vous n’êtes pas autorisé.",
+            "case-402": "Limite atteinte pour l’instant.",
+            "case-403": "Accès refusé.",
+            "case-429": "Trop de tentatives. Réessayez plus tard.",
+            "default": "Erreur. Veuillez réessayer."
+         },
+         "submit": {
+            "checking": "Vérification du code...",
+            "success": "Code vérifié",
+            "case-400": "Code invalide. Réessayez.",
+            "case-401": "Vous n’êtes pas autorisé.",
+            "case-403": "Ce code n’est pas autorisé.",
+            "case-410": "Code expiré. Demandez-en un nouveau.",
+            "default": "Impossible de vérifier le code. Réessayez."
+         }
+      },
+      "email": {
+         "placeholder": "Entrez votre e-mail...",
+         "label": "E-mail",
+         "submit": {
+            "checking": "Envoi du lien...",
+            "success": "E-mail envoyé. Vérifiez votre boîte de réception.",
+            "case-400": "E-mail invalide. Vérifiez et réessayez.",
+            "case-401": "Vous n’êtes pas autorisé.",
+            "case-402": "Limite atteinte pour l’instant.",
+            "case-403": "Accès refusé.",
+            "case-429": "Trop de tentatives. Réessayez plus tard.",
+            "default": "Impossible d’envoyer le lien. Réessayez.",
+            "use-existing": "Nous vous avons déjà envoyé un e-mail récemment. Utilisez ce code ou attendez <strong>{s}</strong>s pour en demander un nouveau."
+         },
+         "how do i make an account?": "Comment créer un compte ?"
+      },
+      "completed": {
+         "title": "C’est bon !",
+         "checking": "Finalisation de la connexion...",
+         "signed-implicit": "Connecté via le flux implicite.",
+         "signed-pkce": "Connecté via le flux PKCE.",
+         "no-auth-params": "Aucun paramètre d’authentification trouvé.",
+         "auth-error": "Erreur d’authentification",
+         "exchange-warning": "Avertissement d’échange d’authentification",
+         "role-error": "Erreur de récupération du rôle",
+         "done-as": "Connecté en tant que <strong>{role}</strong>.",
+         "connected-as": "Vous êtes connecté avec <strong>{email}</strong> en tant que <strong>{role}</strong>.",
+         "role-label": "Rôle"
+      }
+   },
+
+   "languages": {
+      "language": "français",
+      "ar": "arabe",
+      "en": "anglais",
+      "fr": "français"
+   },
+
+   "globals": {
+      "continue": "continuer",
+      "next": "suivant",
+      ",": ",",
+      "?": "?",
+      "login": "se connecter",
+      "logout": "se déconnecter",
+      "fit": "ajuster",
+      "retry": "réessayer",
+      "or": "ou",
+      "error": "erreur"
+   },
+
+   "canvas": {
+      "private": "privé",
+      "female": "femme",
+      "male": "homme",
+      "unknown": "inconnu",
+
+      "loading-message": "Chargement de la carte…",
+      "search-placeholder": "Rechercher un nom…"
+   },
+
+   "person-panel": {
+      "person": "personne",
+      "female": "femme",
+      "male": "homme",
+      "age": "âge",
+      "firstname": "prénom",
+      "lastname": "nom",
+      "fullname": "nom complet",
+      "birth": "naissance",
+      "death": "décès",
+      "gender": "sexe",
+      "unknown": "inconnu",
+      "parents": "les parents",
+      "spouses": "les époux",
+      "children": "les enfants",
+      "bloodline": "la lignée paternelle",
+      "identity": "l'identité"
+   },
+
+   "kinship": {
+      "title": "Lien de parenté",
+      "pair": "{a} ↔ {b}",
+      "distant": "éloigné",
+
+      "self": "soi-même",
+
+      "father": "père",
+      "mother": "mère",
+
+      "son": "fils",
+      "daughter": "fille",
+
+      "grandfather": "grand-père",
+      "grandmother": "grand-mère",
+      "great-grandfather": "arrière-grand-père",
+      "great-grandmother": "arrière-grand-mère",
+      "great-great-grandfather": "arrière-arrière-grand-père",
+      "great-great-grandmother": "arrière-arrière-grand-mère",
+
+      "grandson": "petit-fils",
+      "granddaughter": "petite-fille",
+      "great-grandson": "arrière-petit-fils",
+      "great-granddaughter": "arrière-petite-fille",
+      "great-great-grandson": "arrière-arrière-petit-fils",
+      "great-great-granddaughter": "arrière-arrière-petite-fille",
+
+      "brother": "frère",
+      "sister": "sœur",
+
+      "husband": "époux",
+      "wife": "épouse",
+
+      "paternal-uncle": "oncle paternel",
+      "maternal-uncle": "oncle maternel",
+      "paternal-aunt": "tante paternelle",
+      "maternal-aunt": "tante maternelle",
+
+      "nephew-through-brother": "fils du frère",
+      "niece-through-brother": "fille du frère",
+      "nephew-through-sister": "fils de la sœur",
+      "niece-through-sister": "fille de la sœur",
+
+      "male-cousin-paternal": "cousin paternel",
+      "female-cousin-paternal": "cousine paternelle",
+      "male-cousin-maternal": "cousin maternel",
+      "female-cousin-maternal": "cousine maternelle",
+
+      "male-cousin-through-paternal-uncle": "cousin (frère du père)",
+      "male-cousin-through-paternal-aunt": "cousin (sœur du père)",
+      "male-cousin-through-maternal-uncle": "cousin (frère de la mère)",
+      "male-cousin-through-maternal-aunt": "cousin (sœur de la mère)",
+      "female-cousin-through-paternal-uncle": "cousine (frère du père)",
+      "female-cousin-through-paternal-aunt": "cousine (sœur du père)",
+      "female-cousin-through-maternal-uncle": "cousine (frère de la mère)",
+      "female-cousin-through-maternal-aunt": "cousine (sœur de la mère)",
+      "unknown": "inconnu"
+   }
+}

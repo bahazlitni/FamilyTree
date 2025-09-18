@@ -1,0 +1,61 @@
+/* /styles/components/kinship-tool-ui.css */
+@layer components {
+   .kinship-tool-ui {
+      position: fixed;
+      right: 16px;
+      top: 16px;
+      width: fit-content;
+      z-index: 1100;
+   }
+
+   .kinship-tool-ui .container {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      justify-content: center;
+      position: relative;
+      min-height: fit-content;
+      min-width: fit-content;
+   }
+
+   .kinship-tool-ui .header {
+      display: flex;
+      gap: 16px;
+      justify-content: center;
+      position: relative;
+   }
+
+   .kinship-tool-ui .panel {
+      min-width: 100%;
+      pointer-events: none;
+      transition: opacity 140ms ease, transform 140ms ease;
+      display: grid;
+      align-items: center;
+      grid-template-columns: 1fr auto 1fr;
+      gap: 12px;
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 12px 14px;
+      position: relative;
+   }
+
+   .kinship-tool-ui .center {
+      min-width: 220px;
+      text-align: center;
+   }
+   .kinship-tool-ui .center .title {
+      font-size: 12px;
+      color: var(--text-muted);
+      letter-spacing: 0.02em;
+      text-transform: uppercase;
+      margin-bottom: 2px;
+   }
+   .kinship-tool-ui .center .relation {
+      font-size: 14px;
+      color: var(--text);
+      font-weight: 600;
+      padding: 4px 8px;
+      border-radius: var(--radius-sm);
+   }
+}

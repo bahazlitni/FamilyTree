@@ -1,0 +1,165 @@
+{
+   "auth": {
+      "OTP": {
+         "sent-to": "We've sent an OTP code to <strong>{email}</strong>.",
+         "label": "Enter OTP code",
+         "resend": {
+            "resend-code": "Resend code",
+            "resend-in-n-seconds": "Resend in {n}s",
+            "success": "Code sent successfully.",
+            "case-400": "Invalid input. Check your details.",
+            "case-401": "You're not authorized.",
+            "case-402": "Limit reached for now.",
+            "case-403": "Access denied.",
+            "case-429": "Too many attempts. Try again later.",
+            "default": "Error. Please try again."
+         },
+         "submit": {
+            "checking": "Checking code...",
+            "success": "Code verified",
+            "case-400": "Invalid code. Please try again.",
+            "case-401": "You're not authorized.",
+            "case-403": "This code is not allowed.",
+            "case-410": "Code expired. Request a new one.",
+            "default": "Couldn't verify the code. Please try again."
+         }
+      },
+      "email": {
+         "placeholder": "Enter your email...",
+         "label": "Email",
+         "submit": {
+            "checking": "Sending link...",
+            "success": "Email sent. Check your inbox.",
+            "case-400": "Invalid email. Check and try again.",
+            "case-401": "You're not authorized.",
+            "case-402": "Limit reached for now.",
+            "case-403": "Access denied.",
+            "case-429": "Too many attempts. Try again later.",
+            "default": "Couldn't send the link. Please try again.",
+            "use-existing": "We already sent you an email recently. Use that code or wait <strong>{s}</strong>s to request a new one."
+         },
+         "how do i make an account?": "How to make an account?"
+      },
+      "completed": {
+         "title": "All set!",
+         "checking": "Finalizing sign-in...",
+         "signed-implicit": "Signed in via implicit flow.",
+         "signed-pkce": "Signed in via PKCE flow.",
+         "no-auth-params": "No auth params found.",
+         "auth-error": "Auth error",
+         "exchange-warning": "Auth exchange warning",
+         "role-error": "Role fetch error",
+         "done-as": "Signed in as <strong>{role}</strong>.",
+         "connected-as": "You are connected with <strong>{email}</strong> as <strong>{role}</strong>.",
+         "role-label": "Role"
+      }
+   },
+
+   "languages": {
+      "language": "english",
+      "ar": "arabic",
+      "en": "english",
+      "fr": "french"
+   },
+
+   "globals": {
+      "continue": "continue",
+      "next": "next",
+      ",": ",",
+      "?": "?",
+      "login": "log in",
+      "logout": "log out",
+      "fit": "fit",
+      "retry": "retry",
+      "or": "or",
+      "error": "error"
+   },
+
+   "canvas": {
+      "private": "private",
+      "male": "male",
+      "age": "age",
+      "unknown": "unknown",
+
+      "loading-message": "Loading map...",
+      "search-placeholder": "Search name..."
+   },
+
+   "person-panel": {
+      "person": "person",
+      "female": "female",
+      "male": "male",
+      "age": "age",
+      "firstname": "first name",
+      "lastname": "last name",
+      "fullname": "full name",
+      "birth": "birth",
+      "death": "death",
+      "gender": "gender",
+      "unknown": "unknown",
+      "parents": "parents",
+      "spouses": "spouses",
+      "children": "children",
+      "bloodline": "paternal line",
+      "identity": "identity"
+   },
+
+   "kinship": {
+      "title": "Kinship",
+      "pair": "{a} ↔ {b}",
+      "distant": "distant",
+
+      "self": "self",
+
+      "father": "father",
+      "mother": "mother",
+
+      "son": "son",
+      "daughter": "daughter",
+
+      "grandfather": "grandfather",
+      "grandmother": "grandmother",
+      "great-grandfather": "great-grandfather",
+      "great-grandmother": "great-grandmother",
+      "great-great-grandfather": "great-great-grandfather",
+      "great-great-grandmother": "great-great-grandmother",
+
+      "grandson": "grandson",
+      "granddaughter": "granddaughter",
+      "great-grandson": "great-grandson",
+      "great-granddaughter": "great-granddaughter",
+      "great-great-grandson": "great-great-grandson",
+      "great-great-granddaughter": "great-great-granddaughter",
+
+      "brother": "brother",
+      "sister": "sister",
+
+      "husband": "husband",
+      "wife": "wife",
+
+      "paternal-uncle": "paternal uncle",
+      "maternal-uncle": "maternal uncle",
+      "paternal-aunt": "paternal aunt",
+      "maternal-aunt": "maternal aunt",
+
+      "nephew-through-brother": "brother’s son",
+      "niece-through-brother": "brother’s daughter",
+      "nephew-through-sister": "sister’s son",
+      "niece-through-sister": "sister’s daughter",
+
+      "male-cousin-paternal": "cousin (paternal)",
+      "female-cousin-paternal": "cousin (paternal)",
+      "male-cousin-maternal": "cousin (maternal)",
+      "female-cousin-maternal": "cousin (maternal)",
+
+      "male-cousin-through-paternal-uncle": "cousin (father’s brother)",
+      "male-cousin-through-paternal-aunt": "cousin (father’s sister)",
+      "male-cousin-through-maternal-uncle": "cousin (mother’s brother)",
+      "male-cousin-through-maternal-aunt": "cousin (mother’s sister)",
+      "female-cousin-through-paternal-uncle": "cousin (father’s brother)",
+      "female-cousin-through-paternal-aunt": "cousin (father’s sister)",
+      "female-cousin-through-maternal-uncle": "cousin (mother’s brother)",
+      "female-cousin-through-maternal-aunt": "cousin (mother’s sister)",
+      "unknown": "unknown"
+   }
+}

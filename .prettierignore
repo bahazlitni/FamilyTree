@@ -1,0 +1,16 @@
+node_modules/
+.next/
+
+.env
+.env.*
+
+*.txt
+*.bat
+
+*.exe
+*.dll
+
+.vscode/
+
+new-ticket.bat
+ticket.txt

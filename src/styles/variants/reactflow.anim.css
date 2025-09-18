@@ -1,0 +1,8 @@
+/* /styles/variants/reactflow.anim.css */
+@layer variants {
+   @keyframes dashmove {
+      to {
+         stroke-dashoffset: -20;
+      }
+   }
+}

@@ -1,7 +1,13 @@
-import type { NextConfig } from "next";
+import createNextIntlPlugin from 'next-intl/plugin'
+import type { NextConfig } from 'next'
 
-const nextConfig: NextConfig = {
-  /* config options here */
-};
+const withNextIntl = createNextIntlPlugin({
+   // optional: see step 4 if you move request.ts elsewhere
+   // experimental: {
+   // createMessagesDeclaration: './messages/en.json' // for strict types of message args
+   // }
+})
 
-export default nextConfig;
+const nextConfig: NextConfig = {}
+
+export default withNextIntl(nextConfig)

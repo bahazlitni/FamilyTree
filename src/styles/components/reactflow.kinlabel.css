@@ -1,0 +1,26 @@
+/* /styles/components/reactflow.kinlabel.css */
+@layer components {
+   .rf-kin-label {
+      position: absolute;
+      bottom: calc(100% + 16px); /* a little above the top edge */
+      left: 50%;
+      transform: translateX(-50%);
+
+      padding: 8px 16px;
+      border-radius: 8px;
+
+      /* Inherit the active state's mini-theme */
+      background: var(--state-bg, var(--element));
+      color: var(--state-text, var(--text));
+      box-shadow: inset 0 0 0 1px var(--state-border, var(--border)),
+         0 6px 16px -10px color-mix(in oklab, var(--color, var(--border-focus)), transparent
+                  75%);
+      white-space: nowrap;
+      font-size: 18px;
+      line-height: 1;
+      pointer-events: none; /* tooltip should not eat mouse events */
+
+      /* A tiny arrow */
+      --arrow: var(--state-bg, var(--element));
+   }
+}

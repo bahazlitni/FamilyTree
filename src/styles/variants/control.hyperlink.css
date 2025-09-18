@@ -1,0 +1,45 @@
+/* /styles/variants/control.hyperlink.css */
+@layer variants {
+   .control[data-variant='hyperlink'] {
+      display: inline;
+      background: transparent;
+      border: none;
+      padding: 0;
+      min-width: 0;
+      border-radius: 0;
+      text-decoration: underline;
+      cursor: pointer;
+      --c-fg: var(--primary); /* default when no state */
+      color: var(--c-fg);
+   }
+   .control[data-variant='hyperlink']:hover {
+      color: color-mix(in srgb, var(--c-fg) 88%, white);
+      text-decoration-thickness: 2px;
+   }
+   .control[data-variant='hyperlink']:active {
+      color: color-mix(in srgb, var(--c-fg) 80%, black);
+   }
+   .control[data-variant='hyperlink']:focus,
+   .control[data-variant='hyperlink']:focus-visible {
+      outline: 2px solid var(--border-focus);
+      outline-offset: 2px;
+   }
+   .control[data-variant='hyperlink'][disabled],
+   .control[data-variant='hyperlink'][aria-disabled='true'] {
+      opacity: 0.6;
+      cursor: not-allowed;
+      pointer-events: none;
+      text-decoration: none;
+   }
+   /* state recolors (reuse existing text tokens) */
+   .control[data-variant='hyperlink'][data-state='success'] {
+      --c-fg: var(--text-success);
+   }
+   .control[data-variant='hyperlink'][data-state='warning'] {
+      --c-fg: var(--text-warning);
+   }
+   .control[data-variant='hyperlink'][data-state='error'],
+   .control[data-variant='hyperlink'][aria-invalid='true'] {
+      --c-fg: var(--text-error);
+   }
+}

@@ -1,0 +1,64 @@
+/* /styles/components/dialog.css */
+@layer components {
+   .dialog {
+      position: fixed;
+      transform: translate(-50%, -50%);
+      top: 50%;
+      left: 50%;
+      z-index: 10000;
+
+      min-width: 300px;
+      width: 90%;
+      max-width: 480px;
+
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: 0 12px 36px var(--shadow);
+   }
+   .dialog .container {
+      display: flex;
+      flex-direction: column;
+      width: 100%;
+      height: 100%;
+      color: var(--text);
+      row-gap: 24px;
+      padding: 24px;
+   }
+
+   .dialog .header {
+      display: grid;
+      align-items: center;
+      grid-template-columns: auto 1fr auto;
+   }
+
+   .dialog .header h1 {
+      flex: 1;
+      justify-self: center;
+      min-width: fit-content;
+   }
+
+   .dialog form,
+   .dialog .field {
+      display: grid;
+      gap: 12px;
+   }
+
+   .dialog label {
+      font-size: 16px;
+      color: var(--text);
+   }
+
+   .dialog .row,
+   .dialog .footer {
+      display: flex;
+      flex-direction: row;
+      justify-content: space-between;
+      column-gap: 12px;
+      align-items: center;
+   }
+
+   .dialog .footer {
+      margin-top: 32px;
+   }
+}

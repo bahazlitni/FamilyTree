@@ -1,0 +1,165 @@
+{
+   "auth": {
+      "OTP": {
+         "sent-to": "أرسلنا رمز التحقق إلى <strong>{email}</strong>.",
+         "label": "أدخل رمز التحقق",
+         "resend": {
+            "resend-code": "إعادة إرسال الرمز",
+            "resend-in-n-seconds": "إعادة الإرسال خلال {n}ث",
+            "success": "تم إرسال الرمز بنجاح.",
+            "case-400": "إدخال غير صالح. تحقق من البيانات.",
+            "case-401": "غير مخوّل.",
+            "case-402": "تم بلوغ الحد مؤقتاً.",
+            "case-403": "تم رفض الوصول.",
+            "case-429": "محاولات كثيرة. حاول لاحقاً.",
+            "default": "خطأ. يرجى المحاولة مرة أخرى."
+         },
+         "submit": {
+            "checking": "جارٍ التحقق من الرمز...",
+            "success": "تم التحقق من الرمز",
+            "case-400": "رمز غير صالح. حاول مرة أخرى.",
+            "case-401": "غير مخوّل.",
+            "case-403": "هذا الرمز غير مسموح.",
+            "case-410": "انتهت صلاحية الرمز. اطلب رمزاً جديداً.",
+            "default": "تعذّر التحقق من الرمز. حاول مرة أخرى."
+         }
+      },
+      "email": {
+         "placeholder": "أدخل بريدك الإلكتروني...",
+         "label": "البريد الإلكتروني",
+         "submit": {
+            "checking": "جارٍ إرسال الرابط...",
+            "success": "تم إرسال البريد. تحقق من صندوق الوارد.",
+            "case-400": "بريد غير صالح. تحقق وحاول مجدداً.",
+            "case-401": "غير مخوّل.",
+            "case-402": "تم بلوغ الحد مؤقتاً.",
+            "case-403": "تم رفض الوصول.",
+            "case-429": "محاولات كثيرة. حاول لاحقاً.",
+            "default": "تعذّر إرسال الرابط. حاول مرة أخرى.",
+            "use-existing": "لقد أرسلنا لك بريداً مؤخراً. استخدم ذلك الرمز أو انتظر <strong>{s}</strong>ث لطلب رمز جديد."
+         },
+         "how do i make an account?": "كيف يمكنني تسجيل حساب ؟"
+      },
+      "completed": {
+         "title": "تمّ كل شيء!",
+         "checking": "جارٍ إتمام تسجيل الدخول...",
+         "signed-implicit": "تم تسجيل الدخول عبر التدفق الضمني.",
+         "signed-pkce": "تم تسجيل الدخول عبر تدفق PKCE.",
+         "no-auth-params": "لا توجد معلمات مصادقة.",
+         "auth-error": "خطأ في المصادقة",
+         "exchange-warning": "تحذير في تبادل المصادقة",
+         "role-error": "خطأ في جلب الدور",
+         "done-as": "سُجّلت الدخول كـ <strong>{role}</strong>.",
+         "connected-as": "أنت متصل بـ <strong>{email}</strong> كـ <strong>{role}</strong>.",
+         "role-label": "الدور"
+      }
+   },
+
+   "languages": {
+      "language": "العربية",
+      "ar": "العربية",
+      "en": "الإنجليزية",
+      "fr": "الفرنسية"
+   },
+
+   "globals": {
+      "continue": "واصل",
+      "next": "التالي",
+      ",": "،",
+      "?": "؟",
+      "login": "تسجيل الدخول",
+      "logout": "تسجيل الخروج",
+      "fit": "ملاءمة",
+      "retry": "إعادة المحاولة",
+      "or": "أو",
+      "error": "خطأ"
+   },
+
+   "canvas": {
+      "loading-message": "جاري تحميل الخريطة...",
+      "private": "خاص",
+      "female": "أنثى",
+      "male": "ذكر",
+      "unknown": "غير معروف",
+
+      "search-placeholder": "ابحث عن اسم..."
+   },
+
+   "person-panel": {
+      "person": "شخص",
+      "female": "أنثى",
+      "male": "ذكر",
+      "age": "العمر",
+      "firstname": "الاسم",
+      "lastname": "اللقب",
+      "fullname": "الاسم الكامل",
+      "birth": "الميلاد",
+      "death": "الوفاة",
+      "gender": "الجنس",
+      "unknown": "غير معروف",
+      "parents": "الوالدان",
+      "spouses": "الأزواج",
+      "children": "الأطفال",
+      "bloodline": "النسب الأبوي",
+      "identity": "الهوية"
+   },
+
+   "kinship": {
+      "title": "صلة القرابة",
+      "pair": "{a} ↔ {b}",
+      "distant": "قرابة بعيدة",
+
+      "self": "نفس الشخص",
+
+      "father": "الأب",
+      "mother": "الأم",
+
+      "son": "ابن",
+      "daughter": "ابنة",
+
+      "grandfather": "جد",
+      "grandmother": "جدة",
+      "great-grandfather": "أب الجد",
+      "great-grandmother": "أم الجد",
+      "great-great-grandfather": "جد الجد",
+      "great-great-grandmother": "جدة الجد",
+
+      "grandson": "حفيد",
+      "granddaughter": "حفيدة",
+      "great-grandson": "ابن الحفيد",
+      "great-granddaughter": "ابنة الحفيد",
+      "great-great-grandson": "حفيد الحفيد",
+      "great-great-granddaughter": "حفيدة الحفيد",
+
+      "brother": "أخ",
+      "sister": "أخت",
+
+      "husband": "زوج",
+      "wife": "زوجة",
+
+      "paternal-uncle": "عم",
+      "maternal-uncle": "خال",
+      "paternal-aunt": "عمة",
+      "maternal-aunt": "خالة",
+
+      "nephew-through-brother": "ابن أخ",
+      "niece-through-brother": "ابنة أخ",
+      "nephew-through-sister": "ابن أخت",
+      "niece-through-sister": "ابنة أخت",
+
+      "male-cousin-paternal": "ابن عم",
+      "female-cousin-paternal": "ابنة عم",
+      "male-cousin-maternal": "ابن خال",
+      "female-cousin-maternal": "ابنة خال",
+
+      "male-cousin-through-paternal-uncle": "ابن عم",
+      "male-cousin-through-paternal-aunt": "ابن عمة",
+      "male-cousin-through-maternal-uncle": "ابن خال",
+      "male-cousin-through-maternal-aunt": "ابن خالة",
+      "female-cousin-through-paternal-uncle": "ابنة عم",
+      "female-cousin-through-paternal-aunt": "ابنة عمة",
+      "female-cousin-through-maternal-uncle": "ابنة خال",
+      "female-cousin-through-maternal-aunt": "ابنة خالة",
+      "unknown": "غير معروف"
+   }
+}

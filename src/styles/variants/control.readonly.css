@@ -1,0 +1,16 @@
+/* /styles/variants/control.readonly.css */
+@layer variants {
+   .control[data-variant='readonly'] {
+      cursor: auto;
+      background: var(--c-surface);
+      border-color: var(--c-border);
+      color: var(--c-fg);
+   }
+   .control[data-variant='readonly']:hover,
+   .control[data-variant='readonly']:focus,
+   .control[data-variant='readonly']:active {
+      background: var(--c-surface);
+      border-color: var(--c-border);
+      color: var(--c-fg);
+   }
+}
