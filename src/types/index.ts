@@ -8,6 +8,8 @@ import { AuthError, User } from '@supabase/supabase-js'
 export type AppRole = 'admin' | 'member' | null
 
 export type Theme = 'light' | 'dark'
+export type ThemeMode = 'light' | 'dark' | 'auto'
+
 export type UIState = '' | 'warning' | 'success' | 'error'
 export type Override<Base, Own> = Omit<Base, keyof Own> & Own
 

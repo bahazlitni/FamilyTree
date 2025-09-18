@@ -6,48 +6,114 @@ import React, {
    useEffect,
    useMemo,
    useState,
+   useRef,
+   ReactNode,
 } from 'react'
 import type { Theme } from '@/types'
 
+type ThemeMode = 'light' | 'dark' | 'auto'
+
 type ThemeCtx = {
+   mode: ThemeMode
    theme: Theme
-   setTheme: (t: Theme) => void
+   setMode: (m: ThemeMode) => void
    toggle: () => void
 }
 
+const STORAGE_KEY = 'theme' // stores 'light' | 'dark' | 'auto'
+
 const ThemeContext = createContext<ThemeCtx | null>(null)
 
-export function ThemeProvider({ children }: { children: React.ReactNode }) {
-   const [theme, setTheme] = useState<Theme>('dark')
+function getSystemPref(): Theme {
+   if (typeof window === 'undefined') return 'dark'
+   return window.matchMedia?.('(prefers-color-scheme: light)').matches
+      ? 'light'
+      : 'dark'
+}
 
-   // initialize from localStorage or system preference
-   useEffect(() => {
-      const stored = (typeof window !== 'undefined' &&
-         localStorage.getItem('theme')) as Theme | null
-      if (stored === 'light' || stored === 'dark') {
-         setTheme(stored)
-         return
+function readInitialMode(): ThemeMode {
+   try {
+      const sp = new URLSearchParams(window.location.search)
+      const q = sp.get('theme')
+      if (q === 'light' || q === 'dark' || q === 'auto') return q
+   } catch {}
+
+   try {
+      const stored = localStorage.getItem(STORAGE_KEY) as ThemeMode | null
+      if (stored === 'light' || stored === 'dark' || stored === 'auto') {
+         return stored
       }
-      const prefersLight = window.matchMedia?.(
-         '(prefers-color-scheme: light)',
-      ).matches
-      setTheme(prefersLight ? 'light' : 'dark')
+   } catch {}
+
+   return 'auto'
+}
+
+export function ThemeProvider({ children }: { children: ReactNode }) {
+   const [mode, setMode] = useState<ThemeMode>('auto')
+   const [theme, setTheme] = useState<Theme>('dark')
+   const mqlRef = useRef<MediaQueryList | null>(null)
+
+   useEffect(() => {
+      const initial = readInitialMode()
+      setMode(initial)
    }, [])
 
-   // apply to <html> and persist
    useEffect(() => {
-      if (typeof document === 'undefined') return
-      document.documentElement.setAttribute('data-theme', theme)
-      localStorage.setItem('theme', theme)
-   }, [theme])
+      if (typeof window === 'undefined') return
+      mqlRef.current = window.matchMedia('(prefers-color-scheme: light)')
 
-   const value = useMemo(
+      const handleChange = () => {
+         if (mode === 'auto') {
+            setTheme(getSystemPref())
+         }
+      }
+
+      mqlRef.current.addEventListener?.('change', handleChange)
+      return () => {
+         mqlRef.current?.removeEventListener?.('change', handleChange)
+      }
+   }, [mode])
+
+   // Compute & apply theme theme; persist mode; sync across tabs
+   useEffect(() => {
+      const nextResolved = mode === 'auto' ? getSystemPref() : mode
+      setTheme(nextResolved)
+
+      // apply to <html>
+      if (typeof document !== 'undefined') {
+         document.documentElement.setAttribute('data-theme', nextResolved)
+      }
+
+      // persist configured mode (not theme)
+      try {
+         localStorage.setItem(STORAGE_KEY, mode)
+      } catch {
+         /* no-op */
+      }
+   }, [mode])
+
+   // Cross-tab sync (when another tab changes the theme)
+   useEffect(() => {
+      const onStorage = (e: StorageEvent) => {
+         if (e.key === STORAGE_KEY && e.newValue) {
+            const v = e.newValue as ThemeMode
+            if (v === 'light' || v === 'dark' || v === 'auto') {
+               setMode(v)
+            }
+         }
+      }
+      window.addEventListener('storage', onStorage)
+      return () => window.removeEventListener('storage', onStorage)
+   }, [])
+
+   const value = useMemo<ThemeCtx>(
       () => ({
+         mode,
          theme,
-         setTheme,
-         toggle: () => setTheme((t) => (t === 'light' ? 'dark' : 'light')),
+         setMode,
+         toggle: () => setMode((cur) => (cur === 'light' ? 'dark' : 'light')),
       }),
-      [theme],
+      [mode, theme]
    )
 
    return (

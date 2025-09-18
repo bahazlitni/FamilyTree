@@ -21,6 +21,7 @@
             "case-401": "You're not authorized.",
             "case-403": "This code is not allowed.",
             "case-410": "Code expired. Request a new one.",
+            "case-429": "Too many attempts. Try again later.",
             "default": "Couldn't verify the code. Please try again."
          }
       },
@@ -77,6 +78,7 @@
 
    "canvas": {
       "private": "private",
+      "female": "female",
       "male": "male",
       "age": "age",
       "unknown": "unknown",

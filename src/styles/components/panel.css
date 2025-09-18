@@ -10,9 +10,9 @@
       border-radius: var(--radius);
       box-shadow: 0 8px 14px var(--shadow);
       width: min-content;
-      min-width: 280px;
-      max-width: 380px;
-      max-height: 92vh;
+      min-width: 300px;
+      max-width: 420px;
+      max-height: 80vh;
       overflow: hidden;
    }
 

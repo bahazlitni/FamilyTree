@@ -14,35 +14,39 @@ import { Override } from '@/types'
 
 import '@/styles/components/otp.css'
 
-/** Utility: make CustomProps override overlapping DOM props */
-
 type Status = '' | 'warning' | 'success' | 'error'
 
 const COOLDOWN_SUCCESS_SECONDS = 30
 const COOLDOWN_FAIL_SECONDS = 5
 const COOLDOWN_SENTINEL = -999
-const CARET_IDX_SENTINEL = -1
 const COOLDOWN_RATE_LIMIT_SECONDS = 120
+const CARET_IDX_SENTINEL = -1
 
-function emptyCode(length: number) {
-   return Array<string>(length).fill('')
-}
-function isFilled(code: string[]): boolean {
-   return code.every((d) => d !== '')
-}
+const emptyCode = (length: number) => Array<string>(length).fill('')
+const isFilled = (code: string[]) => code.every((d) => d !== '')
+const codeToStr = (code: string[]) => code.join('')
 
 interface CustomProps {
    length?: number
    onSubmit?: (token: string) => Promise<AuthResponse>
    onResend?: () => Promise<AuthResponse>
    onNext?: () => void
+   /** if false, disables auto-submit behavior (defaults to true) */
+   autoSubmit?: boolean
 }
 
 type DivProps = React.ComponentPropsWithoutRef<'div'>
 type Props = Override<DivProps, CustomProps>
 
 const OTPInput = React.forwardRef<HTMLDivElement, Props>((props, ref) => {
-   const { length = 6, onSubmit, onResend, onNext, ...rest } = props
+   const {
+      length = 6,
+      onSubmit,
+      onResend,
+      onNext,
+      autoSubmit = true,
+      ...rest
+   } = props
 
    const [code, setCode] = useState<string[]>(emptyCode(length))
    const [status, setStatus] = useState<Status>('')
@@ -50,21 +54,29 @@ const OTPInput = React.forwardRef<HTMLDivElement, Props>((props, ref) => {
    const [caretIdx, setCaretIdx] = useState<number>(CARET_IDX_SENTINEL)
    const [cooldown, setCooldown] = useState<number>(0)
    const [allSelected, setAllSelected] = useState<boolean>(false)
+   const [loading, setLoading] = useState<boolean>(false)
+   const [message, setMessage] = useState<string>('')
+
    const inputsRef = useRef<(HTMLInputElement | null)[]>(
       Array(length).fill(null)
    )
-   const [loading, setLoading] = useState<boolean>(false)
-   const [message, setMessage] = useState<string>('')
+
+   // Prevent auto-submit loops: store the last code string we attempted
+   const lastTriedRef = useRef<string>('')
 
    const tResend = useTranslations('auth.OTP.resend')
    const tSubmit = useTranslations('auth.OTP.submit')
 
-   // Keep refs array and code length in sync if `length` changes
+   // Keep refs and code length synced if `length` changes
    useEffect(() => {
       inputsRef.current = Array(length).fill(null)
       setCode(emptyCode(length))
+      lastTriedRef.current = '' // reset last-attempt marker
       setCaretIdx(CARET_IDX_SENTINEL)
       setAllSelected(false)
+      setStatus('')
+      setMessageStatus('')
+      setMessage('')
    }, [length])
 
    const focusIdx = (i: number) => {
@@ -79,31 +91,57 @@ const OTPInput = React.forwardRef<HTMLDivElement, Props>((props, ref) => {
          next[i] = val
          return next
       })
+      // user edited → allow a new attempt
+      lastTriedRef.current = ''
    }
+
+   const clearAll = useCallback(() => {
+      setCode(emptyCode(length))
+      setStatus('')
+      setMessageStatus('')
+      setMessage('')
+      setAllSelected(false)
+      lastTriedRef.current = ''
+      setCaretIdx(0)
+      setTimeout(() => inputsRef.current[0]?.focus(), 0)
+   }, [length])
 
    const handleChange = (e: React.ChangeEvent<HTMLInputElement>, i: number) => {
       const raw = e.target.value.replace(/\D/g, '')
       if (!raw) return
+
+      // Keep only first digit typed here
       setCodeAt(i, raw[0])
 
+      // Move caret to next empty cell (or stop at last)
       if (i < length - 1) {
-         // find next empty box (skip already filled)
-         let nextI = i + 1
          setCode((curr) => {
-            while (nextI < length - 1 && curr[nextI] !== '') nextI++
+            let nextI = i + 1
+            while (nextI < length && curr[nextI] !== '') nextI++
+            // if all subsequent are filled, keep focus at last cell
+            focusIdx(Math.min(nextI, length - 1))
             return curr
          })
-         focusIdx(nextI)
       }
    }
 
    const handlePaste = (e: ClipboardEvent<HTMLInputElement>) => {
-      const pasted = e.clipboardData.getData('text').trim()
-      if (/^\d+$/.test(pasted) && pasted.length === length) {
-         setCode(pasted.split(''))
-         setCaretIdx(CARET_IDX_SENTINEL)
-      }
+      // try to spread digits across boxes, starting at focused index (or 0)
+      const pasted = e.clipboardData.getData('text').trim().replace(/\D/g, '')
+      if (!pasted) return
       e.preventDefault()
+
+      const start = caretIdx >= 0 ? caretIdx : 0
+      const next = [...code]
+      let j = 0
+      for (let i = start; i < length && j < pasted.length; i++, j++) {
+         next[i] = pasted[j]
+      }
+      setCode(next)
+      lastTriedRef.current = '' // allow new attempt
+      // move caret to last filled or end
+      const lastPos = Math.min(start + pasted.length, length - 1)
+      focusIdx(lastPos)
    }
 
    const handleKeyDown = (
@@ -124,8 +162,7 @@ const OTPInput = React.forwardRef<HTMLDivElement, Props>((props, ref) => {
          setMessage('')
 
          if (allSelected) {
-            setCode(emptyCode(length))
-            focusIdx(0)
+            clearAll()
             return
          }
 
@@ -139,10 +176,15 @@ const OTPInput = React.forwardRef<HTMLDivElement, Props>((props, ref) => {
             }
             return next
          })
+         lastTriedRef.current = '' // editing → allow new attempt
       }
 
       if (e.key === 'ArrowRight' && i < length - 1) focusIdx(i + 1)
       if (e.key === 'ArrowLeft' && i > 0) focusIdx(i - 1)
+      if (e.key === 'Enter' && onSubmit && isFilled(code) && !loading) {
+         // Manual submit: ignore lastTried guard to respect Enter intent
+         void performSubmit(true)
+      }
    }
 
    const resendCode = useCallback(async () => {
@@ -154,6 +196,7 @@ const OTPInput = React.forwardRef<HTMLDivElement, Props>((props, ref) => {
          setMessage(tResend('success'))
          setMessageStatus('success')
          setCooldown(COOLDOWN_SUCCESS_SECONDS)
+         clearAll() // start fresh after resend
       } else {
          const statusCode = (error as any)?.status || 0
          setMessageStatus('error')
@@ -186,17 +229,22 @@ const OTPInput = React.forwardRef<HTMLDivElement, Props>((props, ref) => {
       }
       setStatus('')
       setLoading(false)
-   }, [onResend, tResend])
+   }, [onResend, tResend, clearAll])
 
-   // Auto-submit when all boxes are filled
-   useEffect(() => {
-      if (!onSubmit || !isFilled(code) || loading) return
+   // Internal submit that respects lastTried guard unless forced (Enter)
+   const performSubmit = useCallback(
+      async (force = false) => {
+         if (!onSubmit) return
+         const token = codeToStr(code)
+         if (!isFilled(code)) return
+         if (!force && lastTriedRef.current === token) return // prevent loop
 
-      setLoading(true)
-      setMessage(tSubmit('checking'))
+         setLoading(true)
+         setMessage(tSubmit('checking'))
+         lastTriedRef.current = token
 
-      onSubmit(code.join(''))
-         .then(({ error }) => {
+         try {
+            const { error } = await onSubmit(token)
             if (!error) {
                setMessage(tSubmit('success'))
                setStatus('success')
@@ -219,14 +267,32 @@ const OTPInput = React.forwardRef<HTMLDivElement, Props>((props, ref) => {
                   case 410:
                      setMessage(tSubmit('case-410'))
                      break
+                  case 429:
+                     setMessage(tSubmit('case-429'))
+                     break
                   default:
                      setMessage(tSubmit('default'))
                      break
                }
+               // NOTE: we do NOT clear the code here; we just mark lastTriedRef,
+               // so no immediate re-submit will occur until user edits.
             }
-         })
-         .finally(() => setLoading(false))
-   }, [code, onSubmit, onNext, tSubmit, loading])
+         } finally {
+            setLoading(false)
+         }
+      },
+      [code, onSubmit, onNext, tSubmit]
+   )
+
+   // Auto-submit when filled, but only if different from last tried
+   useEffect(() => {
+      if (!autoSubmit || !onSubmit || loading) return
+      if (!isFilled(code)) return
+      const token = codeToStr(code)
+      if (token && token !== lastTriedRef.current) {
+         void performSubmit(false)
+      }
+   }, [code, onSubmit, autoSubmit, performSubmit, loading])
 
    // Cooldown tick
    useEffect(() => {
@@ -275,15 +341,21 @@ const OTPInput = React.forwardRef<HTMLDivElement, Props>((props, ref) => {
                      inputMode="numeric"
                      pattern="[0-9]*"
                      maxLength={1}
-                     value=""
+                     value="" // visual digit is rendered outside
                      onChange={(e) => handleChange(e, i)}
                      onKeyDown={(e) => handleKeyDown(e, i)}
                      onFocus={() => focusIdx(i)}
-                     onBlur={() => focusIdx(CARET_IDX_SENTINEL)}
+                     onBlur={() => setCaretIdx(CARET_IDX_SENTINEL)}
                      onPaste={handlePaste}
                      disabled={loading}
                      aria-label={`Digit ${i + 1}`}
                      data-variant="otp-box"
+                     {...(i === 0
+                        ? {
+                             'data-otp-first': 'true',
+                             autoComplete: 'one-time-code',
+                          }
+                        : {})}
                   />
                   {digit}
                </li>

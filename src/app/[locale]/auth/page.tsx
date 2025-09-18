@@ -6,38 +6,30 @@ import { createClient } from '@/lib/supabase/client'
 import { useLocale, useTranslations } from 'next-intl'
 import { cap } from '@/lib/utils'
 import OTPInput from '@/components/OTPInput'
-import { AuthResponse } from '@supabase/supabase-js'
 import EmailInput from '@/components/EmailInput'
+import { AuthResponse } from '@supabase/supabase-js'
 import { AppRole } from '@/types'
 import Link from 'next/link'
 import { useSearchParams } from 'next/navigation'
 import { LanguageSwitcher } from '@/components/LanguageSwitcher'
 import '@/styles/components/dialog.css'
 import Icon from '@/components/Icon'
+import { useTheme } from '@/contexts/ThemeContext'
+import ThemeToggleButton from '@/components/ThemeToggleButton'
 
-/* ---------------- types & constants ---------------- */
 type UIState = '' | 'warning' | 'success' | 'error'
 type Step = 'email' | 'otp' | 'completed'
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/i
+const SS_EMAIL_KEY = 'auth:email'
+const SS_STEP_KEY = 'auth:step'
+const SS_OTP_TS_KEY = 'auth:otp_ts'
+const EXPIRY_DURATION_MS = 5 * 60 * 1000
+const EXPIRY_GRACE_MS = 3 * 1000
 
-const SS_EMAIL_KEY = 'auth:email' // last submitted normalized email
-const SS_STEP_KEY = 'auth:step' // requested: 'email' | 'otp' | 'completed'
-const SS_OTP_TS_KEY = 'auth:otp_ts' // ms when OTP email was last sent
-
-const EXPIRY_DURATION_MS = 5 * 60 * 1000 // 5 minutes
-const EXPIRY_GRACE_MS = 3 * 1000 // treat <3s left as expired
-
-/* ---------------- helpers ---------------- */
-function normalizeEmail(e: string) {
-   return e.trim().toLowerCase()
-}
-function isEmailValid(e: string) {
-   return EMAIL_RE.test(normalizeEmail(e))
-}
-function nowMs() {
-   return Date.now()
-}
+const normalizeEmail = (e: string) => e.trim().toLowerCase()
+const isEmailValid = (e: string) => EMAIL_RE.test(normalizeEmail(e))
+const nowMs = () => Date.now()
 
 function parseHashParams(hash: string) {
    const h = new URLSearchParams(hash.replace(/^#/, ''))
@@ -47,7 +39,6 @@ function parseHashParams(hash: string) {
       error: h.get('error_description') || h.get('error'),
    }
 }
-
 function computeSafeNext(nextParam: string | null, locale: string) {
    const fallback = `/${locale}/canvas`
    if (!nextParam) return fallback
@@ -61,73 +52,54 @@ function computeSafeNext(nextParam: string | null, locale: string) {
    }
 }
 
-/* ----- sessionStorage accessors (safe) ----- */
-function ssGet(key: string): string {
+const ssGet = (k: string) => {
    try {
-      return sessionStorage.getItem(key) || ''
+      return sessionStorage.getItem(k) || ''
    } catch {
       return ''
    }
 }
-function ssSet(key: string, val: string) {
+const ssSet = (k: string, v: string) => {
    try {
-      sessionStorage.setItem(key, val)
+      sessionStorage.setItem(k, v)
    } catch {}
 }
-function ssDel(key: string) {
+const ssDel = (k: string) => {
    try {
-      sessionStorage.removeItem(key)
+      sessionStorage.removeItem(k)
    } catch {}
 }
 
-function ssGetEmail(): string {
-   return ssGet(SS_EMAIL_KEY)
-}
-function ssSetEmail(v: string) {
-   ssSet(SS_EMAIL_KEY, normalizeEmail(v))
-}
-function ssClearEmail() {
-   ssDel(SS_EMAIL_KEY)
-}
+const ssGetEmail = () => ssGet(SS_EMAIL_KEY)
+const ssSetEmail = (v: string) => ssSet(SS_EMAIL_KEY, normalizeEmail(v))
+const ssClearEmail = () => ssDel(SS_EMAIL_KEY)
 
-function ssGetStep(): Step | null {
+const ssGetStep = (): Step | null => {
    const v = ssGet(SS_STEP_KEY)
    return v === 'otp' || v === 'completed' ? v : v === 'email' ? 'email' : null
 }
-function ssSetStep(step: Step) {
-   ssSet(SS_STEP_KEY, step)
-}
-function ssClearStep() {
-   ssDel(SS_STEP_KEY)
-}
+const ssSetStep = (s: Step) => ssSet(SS_STEP_KEY, s)
+const ssClearStep = () => ssDel(SS_STEP_KEY)
 
-function ssGetOtpTs(): number {
+const ssGetOtpTs = () => {
    const v = ssGet(SS_OTP_TS_KEY)
    return v ? Number(v) : 0
 }
-function ssSetOtpTs(ts: number) {
-   ssSet(SS_OTP_TS_KEY, String(ts))
-}
-function ssClearOtpTs() {
-   ssDel(SS_OTP_TS_KEY)
-}
+const ssSetOtpTs = (ts: number) => ssSet(SS_OTP_TS_KEY, String(ts))
+const ssClearOtpTs = () => ssDel(SS_OTP_TS_KEY)
 
-function isOtpFresh(issuedAtMs: number): boolean {
-   if (!issuedAtMs) return false
-   const elapsed = nowMs() - issuedAtMs
-   return elapsed < EXPIRY_DURATION_MS - EXPIRY_GRACE_MS
-}
+const isOtpFresh = (issuedAtMs: number) =>
+   issuedAtMs && nowMs() - issuedAtMs < EXPIRY_DURATION_MS - EXPIRY_GRACE_MS
 
-/* ----- “rich message” model for completed step ----- */
 type CompletedMsg = {
-   key: `completed.${string}` // translation key under 'auth'
+   key: `completed.${string}`
    values?: Record<string, unknown>
    state: UIState
    details?: string
 } | null
 
-/* -------------- component --------------- */
 export default function AuthPage() {
+   const { theme } = useTheme()
    const supabase = createClient()
    const locale = useLocale()
    const t = useTranslations('auth')
@@ -139,15 +111,14 @@ export default function AuthPage() {
       return computeSafeNext(nextParam, locale)
    }, [searchParams, locale])
 
-   // requested step (UI intent)
    const [step, setStep] = useState<Step>('email')
-
-   // facts for rendering/guards
-   const submittedEmailRef = useRef<string>('') // normalized
+   const submittedEmailRef = useRef<string>('')
    const [completedMsg, setCompletedMsg] = useState<CompletedMsg>(null)
    const [signingOut, setSigningOut] = useState(false)
-
    const emailInputRef = useRef<HTMLInputElement>(null)
+
+   // NEW: while we are navigating to /api/auth/callback, suppress guards
+   const navigatingRef = useRef(false)
 
    const renderRich = useCallback(
       (key: string, values?: Record<string, unknown>) =>
@@ -158,16 +129,13 @@ export default function AuthPage() {
       [t]
    )
 
-   /* ---------- autofocus (after mount) ---------- */
    useEffect(() => {
       const id = setTimeout(() => emailInputRef.current?.focus(), 120)
       return () => clearTimeout(id)
    }, [])
 
-   /* ---------- FIRST LOAD: resolve requested step combinatorially ---------- */
    useEffect(() => {
       ;(async () => {
-         // 1) If already signed in → go completed
          const { data: sess0 } = await supabase.auth.getSession()
          if (sess0.session) {
             const em = sess0.session.user?.email || ''
@@ -178,7 +146,6 @@ export default function AuthPage() {
             return
          }
 
-         // 2) URL auth params → completed (handshake will finalize)
          const url = new URL(window.location.href)
          const { access_token, refresh_token, error } = parseHashParams(
             url.hash
@@ -191,44 +158,36 @@ export default function AuthPage() {
             return
          }
 
-         // 3) Not signed in → restore last session step/email (Option B)
          const lastStep = ssGetStep() ?? 'email'
          const lastEmail = ssGetEmail()
          submittedEmailRef.current = lastEmail
-
-         if (lastStep === 'otp') {
-            const fresh = isEmailValid(lastEmail) && isOtpFresh(ssGetOtpTs())
-            setStep(fresh ? 'otp' : 'email')
-         } else if (lastStep === 'completed') {
-            // without session, completed is invalid; fallback using same rule as above
-            const fresh = isEmailValid(lastEmail) && isOtpFresh(ssGetOtpTs())
-            setStep(fresh ? 'otp' : 'email')
-         } else {
-            setStep('email')
-         }
+         const fresh = isEmailValid(lastEmail) && isOtpFresh(ssGetOtpTs())
+         setStep(
+            lastStep === 'otp' || lastStep === 'completed'
+               ? fresh
+                  ? 'otp'
+                  : 'email'
+               : 'email'
+         )
       })()
    }, [supabase])
 
-   /* ---------- ALWAYS GUARDS whenever `step` changes ---------- */
+   // GUARD: do nothing while navigating to callback
    useEffect(() => {
+      if (navigatingRef.current) return
       let cancelled = false
       ;(async () => {
          const { data } = await supabase.auth.getSession()
          const signedIn = !!data.session
-
          const email = ssGetEmail() || submittedEmailRef.current
          const valid = isEmailValid(email)
          const fresh = isOtpFresh(ssGetOtpTs())
 
          let next: Step = step
-
-         if (signedIn) {
-            next = 'completed'
-         } else {
-            if (step === 'completed') next = valid && fresh ? 'otp' : 'email'
-            else if (step === 'otp') next = valid && fresh ? 'otp' : 'email'
-            else next = 'email'
-         }
+         if (signedIn) next = 'completed'
+         else if (step === 'completed') next = valid && fresh ? 'otp' : 'email'
+         else if (step === 'otp') next = valid && fresh ? 'otp' : 'email'
+         else next = 'email'
 
          if (!cancelled && next !== step) {
             setStep(next)
@@ -240,83 +199,114 @@ export default function AuthPage() {
       }
    }, [step, supabase])
 
-   // mirror requested step for future refreshes (safe)
    useEffect(() => {
       ssSetStep(step)
    }, [step])
 
-   /* ---------- email redirect target (stable between SSR/CSR) ---------- */
-   const emailRedirectTo = useMemo(() => {
-      const origin =
-         typeof window !== 'undefined'
-            ? window.location.origin
-            : process.env.NEXT_PUBLIC_BASE_URL || ''
-      const base = process.env.NEXT_PUBLIC_BASE_URL || origin
-      const params = new URLSearchParams({ callback: safeNext })
-      return `${base}/${locale}/auth?${params.toString()}`
-   }, [locale, safeNext])
+   useEffect(() => {
+      if (step !== 'otp') return
+      const id = setTimeout(() => {
+         const el = document.querySelector<HTMLInputElement>(
+            '[data-otp-first="true"], input[autocomplete="one-time-code"]'
+         )
+         el?.focus()
+      }, 80)
+      return () => clearTimeout(id)
+   }, [step])
 
-   /* ---------- submit/resend handlers ---------- */
+   // --- API calls (unchanged shapes) ---
+
    const onEmailSubmit = useCallback(
-      async (email: string): Promise<AuthResponse> => {
+      async (email: string) => {
          const normalized = normalizeEmail(email)
-         submittedEmailRef.current = normalized
          ssSetEmail(normalized)
 
-         // OTP economy: if we've sent one within the window, skip resend
-         if (isOtpFresh(ssGetOtpTs())) {
-            ssSetStep('otp')
-            setStep('otp')
-            return { data: { user: null, session: null }, error: null } as any
-         }
-
-         const res = await supabase.auth.signInWithOtp({
-            email: normalized,
-            options: { emailRedirectTo, shouldCreateUser: true },
+         const res = await fetch('/api/auth/send-otp', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email: normalized, locale, theme }),
          })
 
-         if (!res.error) {
-            ssSetOtpTs(nowMs()) // remember issuance moment
-            ssSetStep('otp')
-            setStep('otp')
+         if (!res.ok) {
+            const { error } = await res
+               .json()
+               .catch(() => ({ error: 'Failed' }))
+            return {
+               data: { user: null, session: null },
+               error: new Error(error),
+            } as any
          }
-         return res
+
+         ssSetOtpTs(nowMs())
+         ssSetStep('otp')
+         setStep('otp')
+         return { data: { user: null, session: null }, error: null } as any
       },
-      [emailRedirectTo, supabase]
+      [locale, theme]
    )
 
    const onOTPSubmit = useCallback(
       async (token: string): Promise<AuthResponse> => {
-         return await supabase.auth.verifyOtp({
-            email: ssGetEmail() || submittedEmailRef.current,
-            token,
-            type: 'email',
+         const email = ssGetEmail() || submittedEmailRef.current
+         const res = await fetch('/api/auth/verify-otp', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email, code: token, callback: safeNext }),
          })
+         const json = await res.json()
+
+         if (!res.ok) {
+            return {
+               data: { user: null, session: null },
+               error: {
+                  message: json?.error,
+                  status: res.status,
+               },
+            } as any
+         }
+
+         // IMPORTANT: do NOT setStep('completed') here.
+         // We will navigate to the server confirm route which sets cookies,
+         // then that route redirects to `callback`.
+         if (json?.redirect) {
+            navigatingRef.current = true
+            window.location.assign(json.redirect)
+            return { data: { user: null, session: null }, error: null } as any
+         }
+
+         return {
+            data: { user: null, session: null },
+            error: new Error('No redirect link'),
+         } as any
       },
-      [supabase]
+      [safeNext]
    )
 
    const onOTPResend = useCallback(async (): Promise<AuthResponse> => {
-      const res = await supabase.auth.signInWithOtp({
-         email: ssGetEmail() || submittedEmailRef.current,
-         options: { shouldCreateUser: true, emailRedirectTo },
-         // @ts-expect-error parity with submit
-         type: 'email',
+      const email = ssGetEmail() || submittedEmailRef.current
+      const res = await fetch('/api/auth/send-otp', {
+         method: 'POST',
+         headers: { 'Content-Type': 'application/json' },
+         body: JSON.stringify({ email, locale, theme }),
       })
-      if (!res.error) {
-         ssSetOtpTs(nowMs()) // refresh freshness
+      if (!res.ok) {
+         const { error } = await res.json().catch(() => ({ error: 'Failed' }))
+         return {
+            data: { user: null, session: null },
+            error: new Error(error),
+         } as any
       }
-      return res
-   }, [emailRedirectTo, supabase])
+      ssSetOtpTs(nowMs())
+      return { data: { user: null, session: null }, error: null } as any
+   }, [locale, theme])
 
-   /* ---------- handshake / finalize when `step` === completed ---------- */
+   // Completed handshake (kept as-is for implicit/PKCE fallbacks)
    useEffect(() => {
       if (step !== 'completed') return
       let cancelled = false
       ;(async () => {
          setCompletedMsg({ key: 'completed.checking', state: '' })
 
-         // Try to establish from URL if no session yet
          const { data: sess0 } = await supabase.auth.getSession()
          if (!sess0.session) {
             const url = new URL(window.location.href)
@@ -414,7 +404,6 @@ export default function AuthPage() {
                   })
                }
             } else {
-               // Not signed in → fallback (OTP if email valid & fresh)
                const email = ssGetEmail() || submittedEmailRef.current
                const next =
                   isEmailValid(email) && isOtpFresh(ssGetOtpTs())
@@ -430,7 +419,6 @@ export default function AuthPage() {
       }
    }, [step, supabase, locale, safeNext])
 
-   /* ---------- sign out (inline) ---------- */
    const handleSignOut = useCallback(async () => {
       try {
          setSigningOut(true)
@@ -481,9 +469,11 @@ export default function AuthPage() {
                         }
                      />
                   </button>
-
                   <h1>{cap(g('login'))}</h1>
-                  <LanguageSwitcher />
+                  <div className="row">
+                     <ThemeToggleButton />
+                     <LanguageSwitcher />
+                  </div>
                </div>
 
                <motion.div
@@ -495,12 +485,9 @@ export default function AuthPage() {
                   {step === 'email' && (
                      <EmailInput
                         ref={emailInputRef}
-                        // IMPORTANT: do NOT read sessionStorage here (SSR-safe)
                         initialEmail=""
                         onSubmit={onEmailSubmit}
-                        onNext={() => {
-                           /* onEmailSubmit drives step */
-                        }}
+                        onNext={() => {} /* driven in onEmailSubmit */}
                      />
                   )}
 
@@ -514,13 +501,10 @@ export default function AuthPage() {
                         <div className="row">
                            <OTPInput
                               id="OTP"
-                              onSubmit={async (token) => {
-                                 const res = await onOTPSubmit(token)
-                                 if (!res.error) setStep('completed')
-                                 return res
-                              }}
+                              onSubmit={onOTPSubmit}
                               onResend={onOTPResend}
-                              onNext={() => setStep('completed')}
+                              // IMPORTANT: do not advance here; navigation handles the flow
+                              onNext={undefined}
                               length={6}
                            />
                         </div>
@@ -555,7 +539,7 @@ export default function AuthPage() {
                      <Link
                         data-variant="hyperlink"
                         className="control"
-                        href="/faq/auth/make-account"
+                        href={`/${locale}/faq/auth/make-account`}
                      >
                         {cap(t('email.how do i make an account?'))}
                      </Link>

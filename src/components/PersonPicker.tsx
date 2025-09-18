@@ -1,56 +1,63 @@
 // components/PersonPicker.tsx
 'use client'
-import { useEffect, useState } from 'react'
-import HeadlessCombobox from '@/components/HeadlessCombobox'
+import { useEffect, useMemo, useRef, useState } from 'react'
+import HeadlessCombobox, {
+   HeadlessComboboxHandle,
+} from '@/components/HeadlessCombobox'
 import { usePersonSearch } from '@/hooks/usePersonSearch'
 
 import '@/styles/components/person-picker.css'
 import '@/styles/variants/person-picker.anim.css'
 
 import { CgColorPicker } from 'react-icons/cg'
+import Person from '@/types/Person'
 import { VscLoading } from 'react-icons/vsc'
 
 type Props = {
    limit?: number
    placeholder?: string
+   onPicking?: (picking: boolean) => void
    onPick?: (id?: string) => void
 }
 
 export default function PersonPicker({
    limit = 20,
    placeholder = '',
+   onPicking,
    onPick,
 }: Props) {
    const { searchIds, graph } = usePersonSearch(limit)
    const [pendingExternal, setPendingExternal] = useState<boolean>(false)
-   const [inputValue, setInputValue] = useState<string>('')
+   const pickerRef = useRef<HeadlessComboboxHandle>(null)
    const [personId, setPersonId] = useState<string | undefined>(undefined)
 
-   useEffect(() => {
-      onPick?.(personId)
-      if (!graph) return
-      const person = graph.person(personId)
-      if (person) setInputValue(person.fullname ?? '')
-   }, [personId, graph, onPick])
+   const inputValue: string = useMemo(() => {
+      if (!graph || !personId) return ''
+      const person: Person | undefined = graph.person(personId)
+      if (!person) return ''
+      return person.fullname ?? ''
+   }, [personId, graph])
+
+   useEffect(() => onPick?.(personId), [personId, onPick])
 
    useEffect(() => {
-      if (!inputValue) setPersonId(undefined)
-   }, [inputValue])
+      onPicking?.(pendingExternal)
+   }, [pendingExternal])
 
    useEffect(() => {
       if (!graph || !pendingExternal) return
 
       const onDoc = (e: MouseEvent) => {
+         let n = e.target as HTMLElement | null
          let id: string | undefined
 
          const el = (e.target as HTMLElement)?.closest<HTMLElement>(
             '[id^="P:"]'
          )
          if (el) id = el.id
-         else return
+
          document.removeEventListener('click', onDoc)
          setPendingExternal(false)
-
          if (id) setPersonId(id)
       }
 
@@ -61,10 +68,10 @@ export default function PersonPicker({
    return (
       <div className="person-picker">
          <HeadlessCombobox
+            ref={pickerRef}
             className="person-picker-root"
             placeholder={placeholder}
             value={inputValue}
-            onChange={(e) => setInputValue(e.target.value)}
             onSelect={(id?: string) => setPersonId(id)}
             onFocus={() => setPendingExternal(false)}
             clearOnOutside={false}

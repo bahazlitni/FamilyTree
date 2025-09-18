@@ -1,12 +1,7 @@
 'use client'
 
 import React, { useCallback, useEffect, useMemo, useState } from 'react'
-import ReactFlow, {
-   useNodesInitialized,
-   useReactFlow,
-   Node,
-   Edge,
-} from 'reactflow'
+import ReactFlow, { useNodesInitialized, useReactFlow, Node } from 'reactflow'
 import 'reactflow/dist/style.css'
 
 import { nodeTypes as NODE_TYPES } from '@/components/nodeTypes'
@@ -14,8 +9,6 @@ import { edgeTypes as EDGE_TYPES } from '@/components/edgeTypes'
 
 import { EPCID } from '@/lib/utils'
 import SearchBox from '@/components/SearchBox'
-import { useTheme } from '@/contexts/ThemeContext'
-import { FiMoon, FiSun } from 'react-icons/fi'
 import { MdFitScreen } from 'react-icons/md'
 
 import PersonPanel from './PersonPanel'
@@ -29,6 +22,7 @@ import SignInButton from '@/components/SignInButton'
 import KinshipToolUI from '@/components/KinshipToolUI'
 
 import { useUIActions, useUIState } from '@/contexts/UIStateContext'
+import ThemeToggleButton from './ThemeToggleButton'
 
 /* ----------------------- Helpers: sets & ancestry ----------------------- */
 
@@ -144,7 +138,6 @@ const kinshipPathElements = (
 /* -------------------------------- Canvas -------------------------------- */
 
 export default function GraphCanvas({ appGraph }: { appGraph: AppGraph }) {
-   const { theme, toggle } = useTheme()
    const { focus, requestFocus } = useFocus()
    const tCanvas = useTranslations('canvas')
 
@@ -162,7 +155,6 @@ export default function GraphCanvas({ appGraph }: { appGraph: AppGraph }) {
    // UI state/actions
    const ui = useUIState()
    const {
-      setMode,
       select,
       clearSelection,
       hoverDefaultEnter,
@@ -182,6 +174,26 @@ export default function GraphCanvas({ appGraph }: { appGraph: AppGraph }) {
       const pv = appGraph.graph.personViewOf(focus)
       setPersonView(pv)
    }, [focus, appGraph.graph])
+
+   useEffect(() => {
+      if (!personView || ui.mode !== 'default') {
+         clearSelection()
+         return
+      }
+      const graph = appGraph.graph
+      let id = personView.person.id
+      if (!graph.isMember(id)) {
+         const ids = graph.memberSpousesIdOf(id)
+         if (ids.length === 0) {
+            clearSelection()
+            return
+         }
+         id = ids[0]
+      }
+
+      const side = getAncestralElements(graph, id)
+      select(id, side)
+   }, [personView, appGraph, ui])
 
    // Center on selection (camera zoom 1)
    useEffect(() => {
@@ -244,18 +256,8 @@ export default function GraphCanvas({ appGraph }: { appGraph: AppGraph }) {
          if (!appGraph.graph.has(n.id)) return
          if (evt.metaKey || evt.ctrlKey) return // do nothing with meta in either mode
 
-         if (ui.mode === 'picking') {
-            // picking: add to picks
-            pick(n.id)
-         } else {
-            // selection: set selection side + open panel + center (effect handles center)
-            const side = getAncestralElements(appGraph.graph, n.id)
-            select(n.id, side)
-            // also drive panel open with focus plumbing
-            // (keeps your existing panel behavior)
-            // NB: focus can differ from selected; here we keep them aligned.
-            requestFocus(n.id)
-         }
+         if (ui.mode === 'picking') pick(n.id)
+         else requestFocus(n.id)
       },
       [ui.mode, appGraph.graph, pick, select, requestFocus]
    )
@@ -275,14 +277,7 @@ export default function GraphCanvas({ appGraph }: { appGraph: AppGraph }) {
                <MdFitScreen />
             </button>
 
-            <button
-               className="control"
-               onClick={toggle}
-               aria-label="toggle theme"
-               title="Toggle theme"
-            >
-               {theme === 'dark' ? <FiSun /> : <FiMoon />}
-            </button>
+            <ThemeToggleButton />
 
             <LanguageSwitcher />
 

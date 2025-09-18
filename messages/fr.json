@@ -21,6 +21,7 @@
             "case-401": "Vous n’êtes pas autorisé.",
             "case-403": "Ce code n’est pas autorisé.",
             "case-410": "Code expiré. Demandez-en un nouveau.",
+            "case-429": "Trop de tentatives. Réessayez plus tard.",
             "default": "Impossible de vérifier le code. Réessayez."
          }
       },
