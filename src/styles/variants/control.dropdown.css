@@ -13,6 +13,7 @@
       position: absolute;
       left: 0;
       color: var(--c-fg);
+      transform: translateY(4px);
    }
 
    .control[data-variant='dropdown'].drop-down {

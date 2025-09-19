@@ -16,6 +16,7 @@ import '@/styles/components/dialog.css'
 import Icon from '@/components/Icon'
 import { useTheme } from '@/contexts/ThemeContext'
 import ThemeToggleButton from '@/components/ThemeToggleButton'
+import { useRouter } from 'next/navigation'
 
 type UIState = '' | 'warning' | 'success' | 'error'
 type Step = 'email' | 'otp' | 'completed'
@@ -105,6 +106,8 @@ export default function AuthPage() {
    const t = useTranslations('auth')
    const g = useTranslations('globals')
    const searchParams = useSearchParams()
+
+   const router = useRouter()
 
    const safeNext = useMemo(() => {
       const nextParam = searchParams.get('callback')
@@ -459,13 +462,19 @@ export default function AuthPage() {
             >
                <div className="header">
                   <button
-                     onClick={() => setStep('email')}
+                     onClick={() => {
+                        if (step === 'otp') setStep('email')
+                        else router.push(`/${locale}/canvas`)
+                     }}
                      className="control"
-                     disabled={step !== 'otp'}
                   >
                      <Icon
                         name={
-                           locale === 'ar' ? 'chevron-right' : 'chevron-left'
+                           step === 'otp'
+                              ? locale === 'ar'
+                                 ? 'chevron-right'
+                                 : 'chevron-left'
+                              : 'home'
                         }
                      />
                   </button>

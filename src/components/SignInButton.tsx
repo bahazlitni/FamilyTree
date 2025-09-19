@@ -5,7 +5,13 @@ import Link from 'next/link'
 import { useLocale, useTranslations } from 'use-intl'
 import { usePathname, useSearchParams } from 'next/navigation'
 
-export default function SignInButton() {
+export default function SignInButton({
+   dataVariant,
+   dataState,
+}: {
+   dataVariant?: string
+   dataState?: string
+}) {
    const g = useTranslations('globals')
    const locale = useLocale()
    const pathname = usePathname()
@@ -18,6 +24,8 @@ export default function SignInButton() {
          href={`/${locale}/auth?callback=${next}`}
          aria-label="Log In"
          className="control"
+         data-variant={dataVariant}
+         data-state={dataState}
       >
          {cap(g('login'))}
       </Link>

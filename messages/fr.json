@@ -1,4 +1,47 @@
 {
+   "faqAuth": {
+      "meta": {
+         "title": "Se connecter sans créer de compte",
+         "description": "Fonctionnement de l’e-mail + OTP et rôle d’accès."
+      },
+      "title": "Se connecter sans créer de compte",
+      "updated": "Cette page explique le parcours de connexion actuel et les rôles.",
+      "flow": {
+         "title": "Comment ça marche",
+         "intro": "Pas de mot de passe. Vous vous connectez avec un code à usage unique (OTP).",
+         "steps": {
+            "0": "Saisissez votre e-mail puis cliquez sur Suivant.",
+            "1": "Vérifiez votre boîte mail pour le code OTP à 6 chiffres.",
+            "2": "Entrez correctement le code. L’application le confirme côté serveur.",
+            "3": "Vous êtes redirigé et votre rôle est attribué automatiquement si votre e-mail a été pré-approuvé par les administrateurs."
+         },
+         "note": "Si votre e-mail est associé à un rôle, vous conservez ce rôle tant qu’il reste attribué."
+      },
+      "roles": {
+         "title": "Rôles et accès",
+         "admin": {
+            "name": "Admin",
+            "desc": "Peut lire et écrire toutes les données."
+         },
+         "member": {
+            "name": "Membre",
+            "desc": "Peut lire certaines données non publiques en plus des données publiques. Ne peut pas écrire."
+         },
+         "anon": {
+            "name": "Anonyme (sans rôle)",
+            "desc": "Peut lire uniquement les données publiques. Ne peut pas écrire."
+         }
+      },
+      "faq": {
+         "title": "FAQ",
+         "q1": "Aurais-je besoin d’un mot de passe un jour ?",
+         "a1": "Non. La connexion est sans mot de passe. E-mail + OTP suffisent.",
+         "q2": "Que faire si je devrais avoir un rôle mais qu’il n’apparaît pas après connexion ?",
+         "a2": "Contactez un administrateur pour pré-attribuer le rôle à votre e-mail.",
+         "contact": "Besoin d’aide ? <link>Contactez-nous</link>."
+      }
+   },
+
    "auth": {
       "OTP": {
          "sent-to": "Nous avons envoyé un code OTP à <strong>{email}</strong>.",

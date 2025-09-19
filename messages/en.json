@@ -1,4 +1,44 @@
 {
+   "faqAuth": {
+      "meta": {
+         "title": "Sign-in without creating an account",
+         "description": "How our email + OTP sign-in works and what roles mean."
+      },
+      "title": "Sign in without creating an account",
+      "updated": "This page explains the current sign-in flow and roles.",
+      "flow": {
+         "title": "How the sign-in works",
+         "intro": "You don’t create a password. You sign in with a one-time code (OTP).",
+         "steps": {
+            "0": "Enter your email and press Next.",
+            "1": "Check your inbox for the 6-digit OTP code.",
+            "2": "Enter the code correctly. The app confirms it on the server.",
+            "3": "You are redirected and your role is assigned automatically if your email was pre-approved by admins."
+         },
+         "note": "If your email is flagged with a role, you keep that role as long as it stays assigned."
+      },
+      "roles": {
+         "title": "Roles and access",
+         "admin": { "name": "Admin", "desc": "Can read and write all data." },
+         "member": {
+            "name": "Member",
+            "desc": "Can read specific non-public data on top of the public data. Cannot write data."
+         },
+         "anon": {
+            "name": "Anon (no role)",
+            "desc": "Can read only public data. Cannot write data."
+         }
+      },
+      "faq": {
+         "title": "FAQ",
+         "q1": "Do I ever need a password?",
+         "a1": "No. We use passwordless sign-in. Your email + OTP is enough.",
+         "q2": "What if I should have a role but I don’t get it after sign-in?",
+         "a2": "Contact an admin so they can pre-assign your role to your email.",
+         "contact": "Need help? <link>Contact us</link>."
+      }
+   },
+
    "auth": {
       "OTP": {
          "sent-to": "We've sent an OTP code to <strong>{email}</strong>.",

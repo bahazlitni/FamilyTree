@@ -27,6 +27,7 @@ import {
    FaLinux,
    FaAndroid,
    FaExternalLinkAlt,
+   FaHome,
 } from 'react-icons/fa'
 
 type IconProps = { name: string } & React.ComponentProps<typeof MdEmail>
@@ -82,6 +83,8 @@ export default function Icon({ name, ...props }: IconProps) {
          return <FaCheckCircle {...props} />
       case 'unchecked-box':
          return <FaCircle {...props} />
+      case 'home':
+         return <FaHome {...props} />
       default:
          return <MdOutlineQuestionMark {...props} />
    }

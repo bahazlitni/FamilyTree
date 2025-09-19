@@ -9,11 +9,14 @@
       --c-border-focus: var(--border-focus);
       --c-fg: var(--text);
 
+      height: 36px;
+      min-width: 36px;
+      padding: 0 10px;
+
       position: relative;
       display: inline-flex;
       align-items: center;
       gap: 8px;
-      min-width: fit-content;
       font-size: 14px;
       color: var(--c-fg);
       text-decoration: none;
@@ -25,7 +28,6 @@
       background: var(--c-surface);
       border: 1px solid var(--c-border);
       border-radius: var(--radius-sm);
-      padding: 8px 10px;
    }
 
    .control:not(p.control, ul.control):hover {
@@ -73,7 +75,6 @@
    .control[aria-disabled='true'] {
       opacity: 0.6;
       cursor: not-allowed;
-      filter: grayscale(50%);
    }
    .control[aria-busy='true'] {
       cursor: progress;
@@ -139,6 +140,7 @@
       font-size: 24px !important;
       border: none !important;
       max-width: 52px;
+      height: auto;
       flex: 1;
       border-bottom-width: 2px !important;
       border-bottom-style: solid !important;
@@ -157,6 +159,7 @@
       --c-surface-hover: var(--panel-hover);
       --c-surface-focus: var(--panel-focus);
 
+      height: auto;
       display: flex;
       flex-direction: column;
       justify-content: flex-start;
