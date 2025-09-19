@@ -1,6 +1,5 @@
 // src/app/api/auth/verify-otp/route.ts
 import { NextRequest, NextResponse } from 'next/server'
-import { createServerClient } from '@supabase/ssr'
 import { createClient as createSupabaseAdmin } from '@supabase/supabase-js'
 import { cookies } from 'next/headers'
 import { createSupabaseServer } from '@/lib/supabase/client'
@@ -85,15 +84,49 @@ export async function POST(req: NextRequest) {
       }
       const token_hash = link.properties.hashed_token as string
 
-      // ---------- 3) Prepare the JSON response FIRST (we'll attach cookies to it) ----------
+      // ---------- 3) ENSURE USER ROLE before session issuance ----------
+      try {
+         // Try to read role (service role bypasses RLS)
+         const { data: roleData, error: getRoleErr } = await admin.rpc(
+            'get_user_role',
+            {
+               p_email: normalizedEmail,
+            }
+         )
+         const currentRole: string | null =
+            (Array.isArray(roleData) ? roleData?.[0] : roleData) ?? null
+
+         if (getRoleErr) {
+            console.error('get_user_role error (non-fatal):', getRoleErr)
+         }
+
+         const { error: setRoleErr } = await admin.rpc('set_user_role', {
+            p_email: normalizedEmail,
+            p_role: currentRole ?? 'anon',
+         })
+         if (setRoleErr) {
+            // Don’t block login; just log
+            console.error('set_user_role error (non-fatal):', setRoleErr)
+         }
+
+         // If a role already exists, we do nothing; your trigger/func keeps app_metadata in sync.
+         // Doing nothing avoids unnecessary writes.
+      } catch (roleAssignErr) {
+         console.error(
+            'Role assignment block failed (non-fatal):',
+            roleAssignErr
+         )
+      }
+
+      // ---------- 4) Prepare the JSON response FIRST (we'll attach cookies to it) ----------
       const jsonRes = NextResponse.json({
          redirect: new URL(safeNext, req.nextUrl.origin).toString(),
       })
 
-      // ---------- 4) Create SSR client that WRITES cookies onto jsonRes ----------
+      // ---------- 5) Create SSR client that WRITES cookies onto jsonRes ----------
       const supabase = await createSupabaseServer(cookies)
 
-      // ---------- 5) Verify the hashed token server-side → sets auth cookies on jsonRes ----------
+      // ---------- 6) Verify the hashed token server-side → sets auth cookies on jsonRes ----------
       const { error: verifyErr } = await supabase.auth.verifyOtp({
          type: 'magiclink',
          token_hash,
