@@ -1,0 +1,5 @@
+@layer components {
+   p.control {
+      font-size: 12px;
+   }
+}

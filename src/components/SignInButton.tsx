@@ -1,33 +1,30 @@
 // components/SignInButton.tsx
 'use client'
 import { cap } from '@/lib/utils'
-import Link from 'next/link'
 import { useLocale, useTranslations } from 'use-intl'
 import { usePathname, useSearchParams } from 'next/navigation'
+import { useRouter } from 'next/navigation'
+import Button from '@/components/ui/Button'
+import { UI_Props } from '@/types'
 
-export default function SignInButton({
-   dataVariant,
-   dataState,
-}: {
-   dataVariant?: string
-   dataState?: string
-}) {
+export default function SignInButton({ variant, tone, size }: UI_Props) {
    const g = useTranslations('globals')
    const locale = useLocale()
    const pathname = usePathname()
    const search = useSearchParams()
    const here = pathname + (search?.toString() ? `?${search}` : '')
    const next = encodeURIComponent(here)
+   const router = useRouter()
 
    return (
-      <Link
-         href={`/${locale}/auth?callback=${next}`}
+      <Button
+         onClick={() => router.push(`/${locale}/auth?callback=${next}`)}
          aria-label="Log In"
-         className="control"
-         data-variant={dataVariant}
-         data-state={dataState}
+         variant={variant}
+         tone={tone}
+         size={size}
       >
          {cap(g('login'))}
-      </Link>
+      </Button>
    )
 }

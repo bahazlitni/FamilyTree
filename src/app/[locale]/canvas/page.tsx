@@ -4,25 +4,42 @@ import GraphCanvas from '@/components/GraphCanvas'
 import { useAppGraph } from '@/contexts/AppGraphContext'
 import { useTranslations } from 'next-intl'
 
+import styles from './page.module.css'
+
 export default function Page() {
    const { appGraph, loading, error, refresh } = useAppGraph()
 
    const g = useTranslations('globals')
    const c = useTranslations('canvas')
 
+   const cls = `control ${styles['centered-div']}`
+
    if (loading)
       return (
-         <div data-variant="readonly" className="control">
+         <div
+            className={cls}
+            data-variant="outline"
+            data-size="l"
+            data-tone="blue"
+         >
             {c('loading-message')}
          </div>
       )
 
    if (error || !appGraph) {
       return (
-         <div data-variant="readonly" className="control" aria-invalid={true}>
+         <div
+            className={cls}
+            data-variant="outline"
+            data-size="l"
+            data-tone="red"
+            aria-invalid={true}
+         >
             {error}
             <button
-               data-variant="hyperlink"
+               data-size="s"
+               data-variant="ghost"
+               data-tone="red"
                className="control"
                aria-invalid={true}
                onClick={refresh}

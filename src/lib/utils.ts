@@ -1,4 +1,4 @@
-import { AppGraph, AppRole, TranslationType } from '@/types'
+import { AppGraph, AppRole, TranslationType, UI_Status } from '@/types'
 import Person from '@/types/Person'
 import { MutableRefObject, Ref } from 'react'
 
@@ -140,5 +140,20 @@ export function composeRefs<T>(...refs: Array<Ref<T> | undefined>) {
          if (typeof r === 'function') r(node)
          else (r as MutableRefObject<T | null>).current = node
       }
+   }
+}
+
+export function uiStatusToColor(
+   state?: UI_Status
+): 'red' | 'yellow' | 'green' | '' {
+   switch (state) {
+      case 'warning':
+         return 'yellow'
+      case 'error':
+         return 'red'
+      case 'success':
+         return 'green'
+      default:
+         return ''
    }
 }

@@ -1,0 +1,265 @@
+/* /styles/components/reactflow.node.css */
+@layer components {
+   .react-flow {
+      position: fixed;
+      inset: 0;
+      gap: 8px;
+
+      width: 100%;
+      height: 100vh;
+
+      overflow: hidden;
+
+      z-index: 1;
+      background-color: var(--fill-1);
+   }
+
+   .react-flow-toolbar {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      position: fixed;
+      top: 16px;
+      left: 16px;
+      z-index: 1000;
+   }
+
+   /* Optional: scope RF root to inherit transitions from base */
+   .react-flow__renderer {
+      transition: background-color 0.18s ease, color 0.18s ease,
+         border-color 0.18s ease, box-shadow 0.18s ease;
+   }
+
+   .react-flow-node {
+      outline-width: 2px;
+      outline-style: solid;
+      outline-color: var(--fill-7);
+      border-radius: 16px;
+      background: var(--fill-4);
+      color: var(--fill-11);
+      padding: 10px 12px;
+      position: relative;
+      cursor: pointer;
+   }
+
+   .react-flow-node .fullname {
+      font-weight: 600;
+      font-size: 14px;
+      color: var(--fill-11);
+      margin-bottom: 2px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+   }
+
+   .react-flow-node .lifespan {
+      font-size: 12px;
+      color: var(--fill-10);
+      margin-bottom: 4px;
+   }
+
+   .react-flow-node .spouses {
+      font-size: 12px;
+      color: var(--fill-10);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+   }
+
+   .react-flow-edge {
+      stroke: var(--fill-6);
+      stroke-width: 2px;
+      pointer-events: none;
+   }
+
+   .react-flow__handle {
+      width: 4px;
+      height: 4px;
+      background-color: var(--fill-9);
+      border: none;
+      border-radius: 50%;
+      pointer-events: none;
+   }
+
+   .react-flow-kin-label {
+      position: absolute;
+      bottom: calc(100% + 16px); /* a little above the top edge */
+      left: 50%;
+      transform: translateX(-50%);
+
+      padding: 8px 16px;
+      border-radius: 8px;
+
+      /* Inherit the active state's mini-theme */
+      background: var(--state-bg, var(--element));
+      color: var(--state-text, var(--text));
+      box-shadow: inset 0 0 0 1px var(--state-border, var(--border)),
+         0 6px 16px -10px color-mix(in oklab, var(--color, var(--border-focus)), transparent
+                  75%);
+      white-space: nowrap;
+      font-size: 18px;
+      line-height: 1;
+      pointer-events: none; /* tooltip should not eat mouse events */
+
+      /* A tiny arrow */
+      --arrow: var(--state-bg, var(--element));
+   }
+
+   /* -----------------------------------------------------------
+      * STATE VARIABLES (scoped per-state via CSS custom props)
+      * -----------------------------------------------------------
+      * We map each state to a full mini-theme:
+      * - --state-bg / --state-bg-hover / --state-bg-focus
+      * - --state-border / --state-border-hover / --state-border-focus
+      * - --state-text
+      * - --color (used by outline/stroke for edges)
+      *
+      * Uses your palette tokens so dark/light themes inherit correctly.
+      */
+
+   /* Highlight = yellowish (warning) */
+   .is-highlighted {
+      --state-bg: var(--yellow-4);
+      --state-bg-hover: var(--yellow-5);
+      --state-bg-focus: var(--yellow-6);
+
+      --state-border: var(--yellow-6);
+      --state-border-hover: var(--yellow-6);
+      --state-border-focus: var(--yellow-7);
+
+      --state-text: var(--yellow-11);
+
+      /* edge/outline color */
+      --color: var(--yellow-9);
+   }
+
+   /* Pick-highlight = hover while in picking mode (a sharper warm tone) */
+   .is-pick-highlight {
+      /* Slightly “hotter” than plain highlight so it stands out during picking */
+      --state-bg: color-mix(
+         in oklab,
+         var(--element-warning-hover),
+         var(--element-error-hover) 30%
+      );
+      --state-bg-hover: color-mix(
+         in oklab,
+         var(--element-warning),
+         var(--element-error) 25%
+      );
+      --state-bg-focus: color-mix(
+         in oklab,
+         var(--element-warning-focus),
+         var(--element-error-focus) 30%
+      );
+
+      --state-border: color-mix(
+         in oklab,
+         var(--border-warning),
+         var(--border-error) 35%
+      );
+      --state-border-hover: color-mix(
+         in oklab,
+         var(--border-warning-hover),
+         var(--border-error-hover) 35%
+      );
+      --state-border-focus: color-mix(
+         in oklab,
+         var(--border-warning-focus),
+         var(--border-error-focus) 35%
+      );
+
+      --state-text: var(--text-warning);
+
+      --color: var(--border-warning-focus);
+   }
+
+   /* Selected = blueish (primary) */
+   .is-selected {
+      --state-bg: var(--blue-4);
+      --state-bg-hover: var(--blue-5);
+      --state-bg-focus: var(--blue-6);
+
+      --state-border: var(--blue-6);
+      --state-border-hover: var(--blue-6);
+      --state-border-focus: var(--blue-7);
+
+      --state-text: var(--blue-11);
+
+      /* edge/outline color */
+      --color: var(--blue-9);
+   }
+
+   /* Picked = vivid reddish (danger/error family) */
+   .is-picked {
+      --state-bg: var(--red-4);
+      --state-bg-hover: var(--red-5);
+      --state-bg-focus: var(--red-6);
+
+      --state-border: var(--red-6);
+      --state-border-hover: var(--red-6);
+      --state-border-focus: var(--red-7);
+
+      --state-text: var(--red-11);
+
+      /* edge/outline color */
+      --color: var(--red-9);
+   }
+
+   /* -----------------------------------------------------------
+      * NODE LOOK (background, text, borders, outline/glow)
+      * ----------------------------------------------------------- */
+
+   .is-highlighted.react-flow-node,
+   .is-pick-highlight.react-flow-node,
+   .is-selected.react-flow-node,
+   .is-picked.react-flow-node {
+      background: var(--state-bg);
+      color: var(--state-text);
+      outline-color: var(--color);
+      transition: background-color 120ms ease, box-shadow 120ms ease,
+         outline-color 120ms ease, color 120ms ease;
+   }
+   .is-highlighted.react-flow-node *,
+   .is-pick-highlight.react-flow-node *,
+   .is-selected.react-flow-node *,
+   .is-picked.react-flow-node * {
+      color: var(--state-text);
+   }
+
+   /* Hover/focus refinements */
+   .is-highlighted.react-flow-node:hover,
+   .is-pick-highlight.react-flow-node:hover,
+   .is-selected.react-flow-node:hover,
+   .is-picked.react-flow-node:hover {
+      background: var(--state-bg-hover);
+      outline-color: var(--state-border-hover);
+   }
+
+   .is-highlighted.react-flow-node:focus-within,
+   .is-pick-highlight.react-flow-node:focus-within,
+   .is-selected.react-flow-node:focus-within,
+   .is-picked.react-flow-node:focus-within {
+      background: var(--state-bg-focus);
+      outline-color: var(--state-border-focus);
+   }
+
+   /* -----------------------------------------------------------
+      * EDGES (strokes + motion)
+      * ----------------------------------------------------------- */
+
+   .is-highlighted.react-flow-edge,
+   .is-pick-highlight.react-flow-edge,
+   .is-selected.react-flow-edge,
+   .is-picked.react-flow-edge {
+      stroke-dasharray: 15 15;
+      stroke-width: 3px;
+      stroke: var(--color);
+      animation: dashmove 750ms linear infinite;
+      transition: stroke 120ms ease, stroke-width 120ms ease, filter 120ms ease;
+   }
+
+   /* Slightly stronger emphasis on picked edges */
+   .is-picked.react-flow-edge {
+      stroke-width: 3.25px;
+   }
+}

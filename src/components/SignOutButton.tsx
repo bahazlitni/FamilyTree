@@ -6,6 +6,8 @@ import { useRouter } from 'next/navigation'
 import { useTranslations } from 'next-intl'
 import { cap, pruneSessionStorage } from '@/lib/utils'
 import { useNullableAppGraph } from '@/contexts/AppGraphContext'
+import Button from '@/components/ui/Button'
+import { UI_Props } from '@/types'
 
 const SESSION_VER_KEY = 'auth:session:v'
 
@@ -23,7 +25,7 @@ function bumpSessionVersionAndClearCaches() {
    } catch {}
 }
 
-export default function SignOutButton() {
+export default function SignOutButton({ variant, tone, size }: UI_Props) {
    const g = useTranslations('globals')
    const router = useRouter()
    const [loading, setLoading] = useState(false)
@@ -59,14 +61,16 @@ export default function SignOutButton() {
    }
 
    return (
-      <button
+      <Button
          aria-label="Log Out"
-         className="control"
          onClick={handleSignOut}
          disabled={loading}
          aria-busy={loading}
+         variant={variant}
+         tone={tone}
+         size={size}
       >
          {cap(g('logout'))}
-      </button>
+      </Button>
    )
 }

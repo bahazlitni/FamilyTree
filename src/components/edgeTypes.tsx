@@ -30,7 +30,7 @@ const FlowEdge = (props: EdgeProps) => {
       <path
          id={id}
          d={d}
-         className={clsx('rf-edge', finalCls)}
+         className={clsx('react-flow-edge', finalCls)}
          fill="none"
          vectorEffect="non-scaling-stroke"
       />

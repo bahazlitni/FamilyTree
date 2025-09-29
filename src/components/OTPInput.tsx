@@ -10,11 +10,10 @@ import React, {
 } from 'react'
 import { AuthResponse } from '@supabase/supabase-js'
 import { useTranslations } from 'next-intl'
-import { Override } from '@/types'
+import { Override, UI_Status } from '@/types'
 
 import '@/styles/components/otp.css'
-
-type Status = '' | 'warning' | 'success' | 'error'
+import { uiStatusToColor } from '@/lib/utils'
 
 const COOLDOWN_SUCCESS_SECONDS = 30
 const COOLDOWN_FAIL_SECONDS = 5
@@ -49,8 +48,8 @@ const OTPInput = React.forwardRef<HTMLDivElement, Props>((props, ref) => {
    } = props
 
    const [code, setCode] = useState<string[]>(emptyCode(length))
-   const [status, setStatus] = useState<Status>('')
-   const [messageStatus, setMessageStatus] = useState<Status>('')
+   const [status, setStatus] = useState<UI_Status>('')
+   const [messageStatus, setMessageStatus] = useState<UI_Status>('')
    const [caretIdx, setCaretIdx] = useState<number>(CARET_IDX_SENTINEL)
    const [cooldown, setCooldown] = useState<number>(0)
    const [allSelected, setAllSelected] = useState<boolean>(false)
@@ -329,9 +328,11 @@ const OTPInput = React.forwardRef<HTMLDivElement, Props>((props, ref) => {
                <li
                   key={i}
                   className="control"
-                  data-variant="otp-box"
-                  data-state={
-                     allSelected || caretIdx === i ? 'selected' : status
+                  role="otp-box"
+                  data-tone={
+                     allSelected || caretIdx === i
+                        ? 'blue'
+                        : uiStatusToColor(status)
                   }
                >
                   <input
@@ -378,7 +379,10 @@ const OTPInput = React.forwardRef<HTMLDivElement, Props>((props, ref) => {
                   : tResend('resend-code')}
             </button>
 
-            <p data-state={status || messageStatus} className="control">
+            <p
+               data-tone={uiStatusToColor(status || messageStatus)}
+               className="control"
+            >
                {message}
             </p>
          </div>

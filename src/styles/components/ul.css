@@ -1,0 +1,89 @@
+@layer components {
+   ul.control {
+      list-style: none;
+      border-radius: 10px;
+
+      height: auto;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-start;
+      align-items: flex-start;
+
+      gap: 0;
+      overflow-x: hidden;
+      overflow-y: auto;
+      width: 100%;
+
+      --row-h: 36px;
+      --row-fs: 14px;
+
+      max-height: 260px;
+
+      user-select: none;
+   }
+
+   ul.control:hover {
+      --bd: var(--bd-hover);
+   }
+   ul.control:active {
+      --bd: var(--bd-active);
+   }
+   ul.control:focus {
+      --bd: var(--bd-focus);
+   }
+
+   ul.control > li {
+      width: 100% !important;
+      min-height: var(--row-h);
+      border: none;
+      border-radius: 0;
+      cursor: pointer;
+      height: var(--row-h);
+      font-size: var(--row-fs);
+      border-width: 0;
+      border-radius: 8px;
+      padding-inline: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: flex-start;
+      display: inline-flex;
+      column-gap: 8px;
+   }
+
+   ul.control > li[role='option'].is-active,
+   ul.control > li:hover {
+      background: var(
+         --bg-hover,
+         color-mix(in oklch, var(--bd) 18%, var(--bg))
+      );
+      color: var(--fg-hover, var(--fg));
+   }
+
+   ul.control > li[role='separator'] {
+      height: 1px;
+      margin: 6px 4px;
+      background: color-mix(in oklch, var(--bd) 40%, var(--bg));
+      border-radius: 999px;
+   }
+
+   ul.control[data-size='s'] {
+      --row-h: 28px;
+      --row-fs: 12px;
+   }
+   ul.control[data-size='m'] {
+      --row-h: 32px;
+      --row-fs: 13px;
+   }
+   ul.control[data-size='l'] {
+      --row-h: 36px;
+      --row-fs: 14px;
+   }
+   ul.control[data-size='xl'] {
+      --row-h: 40px;
+      --row-fs: 15px;
+   }
+   ul.control[data-size='xxl'] {
+      --row-h: 48px;
+      --row-fs: 16px;
+   }
+}

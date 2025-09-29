@@ -4,21 +4,21 @@ import { useEffect, useMemo, useRef, useState, useCallback } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
 import { createClient } from '@/lib/supabase/client'
 import { useLocale, useTranslations } from 'next-intl'
-import { cap } from '@/lib/utils'
+import { cap, uiStatusToColor } from '@/lib/utils'
 import OTPInput from '@/components/OTPInput'
 import EmailInput from '@/components/EmailInput'
 import { AuthResponse } from '@supabase/supabase-js'
-import { AppRole } from '@/types'
+import { AppRole, UI_Status } from '@/types'
 import Link from 'next/link'
 import { useSearchParams } from 'next/navigation'
 import { LanguageSwitcher } from '@/components/LanguageSwitcher'
-import '@/styles/components/dialog.css'
 import Icon from '@/components/Icon'
 import { useTheme } from '@/contexts/ThemeContext'
 import ThemeToggleButton from '@/components/ThemeToggleButton'
 import { useRouter } from 'next/navigation'
+import Button from '@/components/ui/Button'
+import UtilityHeader from '@/components/UtilityHeader'
 
-type UIState = '' | 'warning' | 'success' | 'error'
 type Step = 'email' | 'otp' | 'completed'
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/i
@@ -95,9 +95,11 @@ const isOtpFresh = (issuedAtMs: number) =>
 type CompletedMsg = {
    key: `completed.${string}`
    values?: Record<string, unknown>
-   state: UIState
+   state: UI_Status
    details?: string
 } | null
+
+const ignoreSafeNextLinks = ['/*/faq/*']
 
 export default function AuthPage() {
    const { theme } = useTheme()
@@ -111,7 +113,19 @@ export default function AuthPage() {
 
    const safeNext = useMemo(() => {
       const nextParam = searchParams.get('callback')
-      return computeSafeNext(nextParam, locale)
+      const callback = decodeURI(nextParam ?? '')
+
+      const shouldIgnore = ignoreSafeNextLinks.some((pattern) => {
+         const regex = new RegExp('^' + pattern.replace(/\*/g, '.*') + '$')
+         return regex.test(callback)
+      })
+
+      if (callback && !shouldIgnore) {
+         return computeSafeNext(callback, locale)
+      } else {
+         // fallback
+         return `/${locale}/canvas`
+      }
    }, [searchParams, locale])
 
    const [step, setStep] = useState<Step>('email')
@@ -443,105 +457,75 @@ export default function AuthPage() {
 
    return (
       <AnimatePresence>
-         <motion.div
-            className="dialog"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-         >
-            <motion.div
-               className="container"
-               role="dialog"
-               initial={{ y: 12, scale: 0.96 }}
-               animate={{ y: 0, scale: 1 }}
-               transition={{
-                  type: 'spring',
-                  stiffness: 340,
-                  damping: 28,
-                  mass: 0.7,
+         <div className="dialog">
+            <UtilityHeader
+               title={cap(g('login'))}
+               customButton={{
+                  iconName:
+                     step === 'otp'
+                        ? locale === 'ar'
+                           ? 'chevron-right'
+                           : 'chevron-left'
+                        : 'home',
+                  onClick: () => {
+                     if (step === 'otp') setStep('email')
+                     else router.push(`/${locale}/canvas`)
+                  },
                }}
+            />
+
+            <motion.div
+               key={step}
+               initial={{ opacity: 0, x: 25 * (locale === 'ar' ? -1 : 1) }}
+               animate={{ opacity: 1, x: 0 }}
+               transition={{ duration: 0.3 }}
+               className="body"
             >
-               <div className="header">
-                  <button
-                     onClick={() => {
-                        if (step === 'otp') setStep('email')
-                        else router.push(`/${locale}/canvas`)
-                     }}
+               {step === 'email' && (
+                  <EmailInput
+                     ref={emailInputRef}
+                     initialEmail=""
+                     onSubmit={onEmailSubmit}
+                     onNext={() => {} /* driven in onEmailSubmit */}
+                  />
+               )}
+
+               {step === 'otp' && (
+                  <form>
+                     <label htmlFor="OTP">
+                        {renderRich('OTP.sent-to', {
+                           email: submittedEmailRef.current || ssGetEmail(),
+                        })}
+                     </label>
+                     <div className="row">
+                        <OTPInput
+                           id="OTP"
+                           onSubmit={onOTPSubmit}
+                           onResend={onOTPResend}
+                           length={6}
+                        />
+                     </div>
+                  </form>
+               )}
+
+               {step === 'completed' && (
+                  <p
                      className="control"
+                     data-tone={uiStatusToColor(completedMsg?.state)}
+                     data-variant="inline-text"
                   >
-                     <Icon
-                        name={
-                           step === 'otp'
-                              ? locale === 'ar'
-                                 ? 'chevron-right'
-                                 : 'chevron-left'
-                              : 'home'
-                        }
-                     />
-                  </button>
-                  <h1>{cap(g('login'))}</h1>
-                  <div className="row">
-                     <ThemeToggleButton />
-                     <LanguageSwitcher />
-                  </div>
-               </div>
-
-               <motion.div
-                  key={step}
-                  initial={{ opacity: 0, x: 25 * (locale === 'ar' ? -1 : 1) }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ duration: 0.3 }}
-               >
-                  {step === 'email' && (
-                     <EmailInput
-                        ref={emailInputRef}
-                        initialEmail=""
-                        onSubmit={onEmailSubmit}
-                        onNext={() => {} /* driven in onEmailSubmit */}
-                     />
-                  )}
-
-                  {step === 'otp' && (
-                     <form>
-                        <label htmlFor="OTP">
-                           {renderRich('OTP.sent-to', {
-                              email: submittedEmailRef.current || ssGetEmail(),
-                           })}
-                        </label>
-                        <div className="row">
-                           <OTPInput
-                              id="OTP"
-                              onSubmit={onOTPSubmit}
-                              onResend={onOTPResend}
-                              // IMPORTANT: do not advance here; navigation handles the flow
-                              onNext={undefined}
-                              length={6}
-                           />
-                        </div>
-                     </form>
-                  )}
-
-                  {step === 'completed' && (
-                     <p
-                        className="control"
-                        data-state={completedMsg?.state ?? ''}
-                        data-variant="inline-text"
-                     >
-                        {completedMsg ? (
-                           <>
-                              {renderRich(
-                                 completedMsg.key,
-                                 completedMsg.values
-                              )}
-                              {completedMsg.details ? (
-                                 <> — {completedMsg.details}</>
-                              ) : null}
-                           </>
-                        ) : (
-                           renderRich('completed.checking')
-                        )}
-                     </p>
-                  )}
-               </motion.div>
+                     {completedMsg ? (
+                        <>
+                           {renderRich(completedMsg.key, completedMsg.values)}
+                           {completedMsg.details ? (
+                              <> — {completedMsg.details}</>
+                           ) : null}
+                        </>
+                     ) : (
+                        renderRich('completed.checking')
+                     )}
+                  </p>
+               )}
 
                {step === 'email' && (
                   <div className="row">
@@ -557,23 +541,19 @@ export default function AuthPage() {
 
                {step === 'completed' && (
                   <div className="row">
-                     <button
-                        type="button"
-                        className="control"
-                        data-variant="hyperlink"
-                        onClick={handleSignOut}
-                        disabled={signingOut}
-                        aria-busy={signingOut}
-                     >
+                     <Button onClick={handleSignOut} disabled={signingOut}>
                         {cap(g('logout'))}
-                     </button>
-                     <Link href={safeNext} className="control">
+                     </Button>
+                     <Button
+                        onClick={() => router.push(`/${locale}/canvas`)}
+                        tone="green"
+                     >
                         {cap(g('continue'))}
-                     </Link>
+                     </Button>
                   </div>
                )}
             </motion.div>
-         </motion.div>
+         </div>
       </AnimatePresence>
    )
 }

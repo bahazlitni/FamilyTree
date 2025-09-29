@@ -1,0 +1,17 @@
+@layer components {
+   input.control:hover {
+      --bg: var(--bg-hover);
+      --fg: var(--fg-hover);
+      --bd: var(--bd-hover);
+   }
+   input.control:active {
+      --bg: var(--bg-active);
+      --fg: var(--fg-active);
+      --bd: var(--bd-active);
+   }
+   input.control:focus {
+      --bg: var(--bg-focus);
+      --fg: var(--fg-focus);
+      --bd: var(--bd-focus);
+   }
+}

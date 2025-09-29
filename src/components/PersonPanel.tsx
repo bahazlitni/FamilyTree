@@ -5,7 +5,9 @@ import { useEffect, useMemo } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
 import type { PersonView } from '@/types'
 import Person from '@/types/Person'
-import GraphLink from '@/components/GraphLink'
+import LiGraphLink from '@/components/GraphLink/LiGraphLink'
+import ButtonGraphLink from '@/components/GraphLink/ButtonGraphLink'
+
 import { useTranslations, useLocale } from 'next-intl'
 import {
    cap,
@@ -53,18 +55,33 @@ const Row: React.FC<{ label: string; value: React.ReactNode }> = ({
    </div>
 )
 
-const Chip: React.FC<{ id?: string; fullname?: string; meta?: string }> = ({
-   fullname,
-   meta,
-   id,
-}) => {
+const ButtonChip: React.FC<{
+   id?: string
+   fullname?: string
+   meta?: string
+}> = ({ fullname, meta, id }) => {
    const tG = useTranslations('globals')
    return (
-      <GraphLink id={id}>
+      <ButtonGraphLink id={id}>
          <span className="chipAvatar">{(fullname || tG('?'))[0]}</span>
          <span className="chipText">{fullname ?? '—'}</span>
          {meta && <span className="chipMeta">({cap(meta)})</span>}
-      </GraphLink>
+      </ButtonGraphLink>
+   )
+}
+
+const LiChip: React.FC<{
+   id?: string
+   fullname?: string
+   meta?: string
+}> = ({ fullname, meta, id }) => {
+   const tG = useTranslations('globals')
+   return (
+      <LiGraphLink id={id}>
+         <span className="chipAvatar">{(fullname || tG('?'))[0]}</span>
+         <span className="chipText">{fullname ?? '—'}</span>
+         {meta && <span className="chipMeta">({cap(meta)})</span>}
+      </LiGraphLink>
    )
 }
 
@@ -284,9 +301,7 @@ export default function PersonPanel({ open, data, onClose }: PersonPanelProps) {
                </div>
 
                <div className="body">
-                  <Section title={cap(tP('bloodline'))}>
-                     <p className="control">{bloodline}</p>
-                  </Section>
+                  <Section title={cap(tP('bloodline'))}>{bloodline}</Section>
 
                   <Section title={cap(tP('identity'))}>
                      <Row label={tP('gender')} value={logs.gender} />
@@ -302,7 +317,7 @@ export default function PersonPanel({ open, data, onClose }: PersonPanelProps) {
                   {Boolean(data.father || data.mother) && (
                      <Section title={tP('parents')}>
                         <div className="chips">
-                           <Chip
+                           <ButtonChip
                               id={data.father?.id}
                               fullname={fullnameOf(
                                  locale,
@@ -311,7 +326,7 @@ export default function PersonPanel({ open, data, onClose }: PersonPanelProps) {
                               )}
                               meta={tK('father')}
                            />
-                           <Chip
+                           <ButtonChip
                               id={data.mother?.id}
                               fullname={fullnameOf(
                                  locale,
@@ -328,7 +343,7 @@ export default function PersonPanel({ open, data, onClose }: PersonPanelProps) {
                      <Section title={cap(tP('spouses'))} count={spouses.length}>
                         <div className="chips">
                            {spouses.map((s) => (
-                              <Chip
+                              <ButtonChip
                                  key={s.id}
                                  id={s.id}
                                  fullname={fullnameOf(locale, appGraph, s)}
@@ -347,17 +362,16 @@ export default function PersonPanel({ open, data, onClose }: PersonPanelProps) {
                      <Section title={tP('children')} count={children.length}>
                         <ul className="control">
                            {children.map((c) => (
-                              <li key={c.id} className="control">
-                                 <Chip
-                                    id={c.id}
-                                    fullname={fullnameOf(locale, appGraph, c)}
-                                    meta={
-                                       c.is_male
-                                          ? cap(tK('son'))
-                                          : cap(tK('daughter'))
-                                    }
-                                 />
-                              </li>
+                              <LiChip
+                                 key={c.id}
+                                 id={c.id}
+                                 fullname={fullnameOf(locale, appGraph, c)}
+                                 meta={
+                                    c.is_male
+                                       ? cap(tK('son'))
+                                       : cap(tK('daughter'))
+                                 }
+                              />
                            ))}
                         </ul>
                      </Section>

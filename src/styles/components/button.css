@@ -1,0 +1,23 @@
+@layer components {
+   button.control {
+      cursor: pointer;
+      user-select: none;
+      white-space: nowrap;
+      max-width: fit-content;
+   }
+
+   button.control:disabled {
+      cursor: not-allowed !important;
+   }
+
+   button.control:hover {
+      --bg: var(--bg-hover);
+      --fg: var(--fg-hover);
+      --bd: var(--bd-hover);
+   }
+   button.control:active {
+      --bg: var(--bg-active);
+      --fg: var(--fg-active);
+      --bd: var(--bd-active);
+   }
+}

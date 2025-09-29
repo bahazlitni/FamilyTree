@@ -53,11 +53,17 @@ const PersonBaseNode = ({ data }: { data: PersonView }) => {
    }
 
    return (
-      <div id={person.id} className={clsx('rf-node', finalCls)} dir={dir}>
+      <div
+         id={person.id}
+         className={clsx('react-flow-node', finalCls)}
+         dir={dir}
+      >
          {showTop && <Handle type="target" position={Position.Top} id="top" />}
 
          {/* Kinship label (only when picked) */}
-         {kinLabel && <div className="rf-kin-label">{cap(kinLabel)}</div>}
+         {kinLabel && (
+            <div className="react-flow-kin-label">{cap(kinLabel)}</div>
+         )}
 
          <p className="fullname">{displayName}</p>
          {person.hasLifespan() && <p className="lifespan">{person.lifespan}</p>}

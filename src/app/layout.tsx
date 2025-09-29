@@ -1,14 +1,8 @@
 // app/layout.tsx
 import type { Metadata } from 'next'
 import { Geist, Geist_Mono } from 'next/font/google'
-// app/layout.tsx
-import '@/styles/_layers.css'
-import '@/styles/tokens.css'
-import '@/styles/base.css'
-import '@/styles/components/control.css'
-import '@/styles/variants/control.hyperlink.css'
-import '@/styles/variants/control.readonly.css'
-import '@/styles/variants/control.dropdown.css'
+import './globals.css'
+import { getLocale } from 'next-intl/server'
 
 const geistSans = Geist({ variable: '--font-geist-sans', subsets: ['latin'] })
 const geistMono = Geist_Mono({
@@ -21,13 +15,16 @@ export const metadata: Metadata = {
    description: "See whether there is another you in Zlitni's family!",
 }
 
-export default function RootLayout({
+export default async function RootLayout({
    children,
 }: {
    children: React.ReactNode
 }) {
+   const locale = await getLocale()
+   const dir = ['ar', 'fa', 'he', 'ur'].includes(locale) ? 'rtl' : 'ltr'
+
    return (
-      <html lang="en">
+      <html lang={locale} dir={dir} suppressHydrationWarning>
          <body className={`${geistSans.variable} ${geistMono.variable}`}>
             {children}
          </body>

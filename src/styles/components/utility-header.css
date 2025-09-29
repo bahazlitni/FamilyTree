@@ -1,0 +1,17 @@
+@layer components {
+   .utility-header {
+      background-color: var(--fill-1);
+      position: sticky;
+      top: 0;
+      align-items: center;
+      border-bottom: 1px solid var(--fill-4);
+      display: grid;
+      grid-template-columns: auto auto 1fr auto;
+      gap: 16px;
+      padding: 24px;
+   }
+
+   .utility-header h1 {
+      text-align: center;
+   }
+}

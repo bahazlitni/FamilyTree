@@ -1,39 +1,34 @@
 // @/components/KinshipToolUI.tsx
 'use client'
-
 import '@/styles/components/kinship-tool-ui.css'
-import '@/styles/variants/kinship-tool-ui.anim.css'
 
-import { useMemo, useCallback, useState, ChangeEvent } from 'react'
+import { useMemo, useCallback, useState, useEffect } from 'react'
 import { useTranslations } from 'use-intl'
 import { useAppGraph } from '@/contexts/AppGraphContext'
 import { useUIActions, useUIState } from '@/contexts/UIStateContext'
 import { relationKeyAtoB, type KinKey } from '@/lib/kinship'
 import { cap } from '@/lib/utils'
-import HeadlessCombobox from './HeadlessCombobox'
 import { usePersonSearch } from '@/hooks/usePersonSearch'
 import { FaArrowsSplitUpAndLeft } from 'react-icons/fa6'
 import { FaArrowsAltH } from 'react-icons/fa'
+import SearchBox from '@/components/ui/SearchBox'
+import Button from './ui/Button'
 
 type KinshipData = { aKey: KinKey; bKey: KinKey; nameA: string; nameB: string }
 
 export default function KinshipToolUI() {
    const { appGraph } = useAppGraph()
-   const { searchIds } = usePersonSearch(10)
+   const { searchIds } = usePersonSearch()
    const { setMode, pickSlot, setPickingTarget, resetPicks } = useUIActions()
    const ui = useUIState()
    const graph = appGraph?.graph
 
-   const personIdA = useMemo(() => ui.pickedA ?? undefined, [ui.pickedA])
-   const personIdB = useMemo(() => ui.pickedB ?? undefined, [ui.pickedB])
+   const [valueA, setValueA] = useState<string>('')
+   const [valueB, setValueB] = useState<string>('')
 
    const tCanvas = useTranslations('canvas')
    const tKin = useTranslations('kinship')
    const placeholder = tCanvas('search-placeholder')
-
-   // typing flags
-   const [typingA, setTypingA] = useState(false)
-   const [typingB, setTypingB] = useState(false)
 
    // OPEN ≡ PICKING
    const isOpen = ui.mode === 'picking'
@@ -54,15 +49,6 @@ export default function KinshipToolUI() {
          return full || tCanvas('unknown', { gender: g as any })
       },
       [graph, tCanvas]
-   )
-
-   const inputValueA = useMemo(
-      () => (typingA ? undefined : personIdA ? personName(personIdA) : ''),
-      [typingA, personIdA, personName]
-   )
-   const inputValueB = useMemo(
-      () => (typingB ? undefined : personIdB ? personName(personIdB) : ''),
-      [typingB, personIdB, personName]
    )
 
    const kinshipData: KinshipData | undefined = useMemo(() => {
@@ -88,16 +74,16 @@ export default function KinshipToolUI() {
    }, [isOpen, setMode])
 
    const handleChangeA = useCallback(
-      (e: ChangeEvent<HTMLInputElement>) => {
-         setTypingA(true)
-         if (!e.target.value) pickSlot('A', '')
+      (value: string) => {
+         if (!value) pickSlot('A', '')
+         setValueA(value)
       },
       [pickSlot]
    )
    const handleChangeB = useCallback(
-      (e: ChangeEvent<HTMLInputElement>) => {
-         setTypingB(true)
-         if (!e.target.value) pickSlot('B', '')
+      (value: string) => {
+         if (!value) pickSlot('B', '')
+         setValueB(value)
       },
       [pickSlot]
    )
@@ -112,83 +98,80 @@ export default function KinshipToolUI() {
       return renderKin(kinshipData.bKey)
    }, [kinshipData, renderKin])
 
+   useEffect(() => {
+      if (!ui.pickedA) return
+      setValueA(personName(ui.pickedA))
+   }, [ui.pickedA])
+
+   useEffect(() => {
+      if (!ui.pickedB) return
+      setValueB(personName(ui.pickedB))
+   }, [ui.pickedB])
+
    return (
       <div className="kinship-tool-ui">
          <div className="container">
             <div className="header">
                {/* Sliding strip (class driven by PICKING) */}
-               <div className={`inputs-strip ${isOpen ? 'open' : 'closed'}`}>
-                  <HeadlessCombobox
-                     className={`person-picker ${
-                        ui.mode === 'picking' && ui.pickingTarget === 'A'
-                           ? 'selected'
-                           : ''
-                     }`}
-                     placeholder={placeholder}
-                     value={personIdA}
-                     inputValue={inputValueA}
-                     onSelect={(id?: string) => {
-                        if (!id) resetPicks()
-                        else pickSlot('A', id)
-                        setTypingA(false)
-                     }}
-                     onFocus={() => {
-                        setPickingTarget('A')
-                        // keep mode as 'picking' while open
-                     }}
-                     onBlur={() => setTypingA(false)}
-                     onChange={handleChangeA}
-                     clearOnOutside={false}
-                     onSearch={(q) => searchIds(q)}
-                     changeValueOnSelect
-                  />
+               {isOpen && (
+                  <div className={`inputs-strip ${isOpen ? 'open' : 'closed'}`}>
+                     <SearchBox
+                        tone={ui.pickingTarget === 'A' ? 'blue' : ''}
+                        className={`person-picker ${
+                           ui.mode === 'picking' && ui.pickingTarget === 'A'
+                              ? 'selected'
+                              : ''
+                        }`}
+                        value={valueA}
+                        placeholder={placeholder}
+                        onSelect={(item?) => {
+                           if (!item) resetPicks()
+                           else pickSlot('A', item.id)
+                        }}
+                        onFocus={() => {
+                           setPickingTarget('A')
+                           // keep mode as 'picking' while open
+                        }}
+                        onChange={handleChangeA}
+                        onSearch={(q: string) => searchIds(q)}
+                     />
 
-                  <HeadlessCombobox
-                     className={`person-picker ${
-                        ui.mode === 'picking' && ui.pickingTarget === 'B'
-                           ? 'selected'
-                           : ''
-                     }`}
-                     placeholder={placeholder}
-                     value={personIdB}
-                     inputValue={inputValueB}
-                     onSelect={(id?: string) => {
-                        if (!id) resetPicks()
-                        else pickSlot('B', id)
-                        setTypingB(false)
-                     }}
-                     onFocus={() => {
-                        setPickingTarget('B')
-                     }}
-                     onBlur={() => setTypingB(false)}
-                     onChange={handleChangeB}
-                     clearOnOutside={false}
-                     onSearch={(q) => searchIds(q)}
-                     changeValueOnSelect
-                  />
+                     <SearchBox
+                        value={valueB}
+                        tone={ui.pickingTarget === 'B' ? 'blue' : ''}
+                        placeholder={placeholder}
+                        onSelect={(item?) => {
+                           if (!item) resetPicks()
+                           else pickSlot('B', item.id)
+                        }}
+                        onFocus={() => {
+                           setPickingTarget('B')
+                        }}
+                        onSearch={searchIds}
+                        onChange={handleChangeB}
+                     />
 
-                  {/* Label centered under the two inputs */}
-                  {kinshipData && (
-                     <div className="kin-label" aria-live="polite">
-                        <span>{kinLabelA}</span>
-                        <FaArrowsAltH />
-                        <span>{kinLabelB}</span>
-                     </div>
-                  )}
-               </div>
+                     {/* Label centered under the two inputs */}
+                     {kinshipData && (
+                        <div className="kin-label" aria-live="polite">
+                           <span>{kinLabelA}</span>
+                           <FaArrowsAltH />
+                           <span>{kinLabelB}</span>
+                        </div>
+                     )}
+                  </div>
+               )}
 
                {/* Single picker/open button with active state */}
-               <button
-                  type="button"
-                  className="control"
+               <Button
                   onClick={handlePickToggle}
                   title={
                      isOpen ? 'Close & stop picking' : 'Open & pick from graph'
                   }
-                  data-state={isOpen ? 'selected' : ''}
+                  tone={isOpen ? 'blue' : ''}
                >
                   <FaArrowsSplitUpAndLeft />
-               </button>
+               </Button>
             </div>
          </div>
       </div>

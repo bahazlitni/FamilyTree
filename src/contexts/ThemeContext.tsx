@@ -9,9 +9,7 @@ import React, {
    useRef,
    ReactNode,
 } from 'react'
-import type { Theme } from '@/types'
-
-type ThemeMode = 'light' | 'dark' | 'auto'
+import type { Theme, ThemeMode } from '@/types'
 
 type ThemeCtx = {
    mode: ThemeMode

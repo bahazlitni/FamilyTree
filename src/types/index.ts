@@ -10,7 +10,34 @@ export type AppRole = 'admin' | 'member' | null
 export type Theme = 'light' | 'dark'
 export type ThemeMode = 'light' | 'dark' | 'auto'
 
-export type UIState = '' | 'warning' | 'success' | 'error'
+export type UI_Size = 's' | 'm' | 'l' | 'xl' | 'xxl'
+export type UI_Variant =
+   | ''
+   | 'soft'
+   | 'outline'
+   | 'ghost'
+   | 'primary'
+   | 'hyperlink'
+
+export interface UI_Props {
+   variant?: UI_Variant
+   tone?: UI_Tone
+   size?: UI_Size
+}
+
+export type UI_Tone =
+   | ''
+   | 'gray'
+   | 'red'
+   | 'orange'
+   | 'yellow'
+   | 'green'
+   | 'cyan'
+   | 'blue'
+   | 'purple'
+   | 'magenta'
+
+export type UI_Status = '' | 'warning' | 'success' | 'error'
 export type Override<Base, Own> = Omit<Base, keyof Own> & Own
 
 export type Gender = 'male' | 'female' | 'other'

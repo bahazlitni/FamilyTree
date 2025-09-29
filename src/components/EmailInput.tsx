@@ -2,12 +2,12 @@
 
 import { useEffect, useMemo, useState, useCallback, forwardRef } from 'react'
 import { useLocale, useTranslations } from 'next-intl'
-import { cap } from '@/lib/utils'
+import { cap, uiStatusToColor } from '@/lib/utils'
 import Icon from '@/components/Icon'
 import { AuthResponse } from '@supabase/supabase-js'
-import { Override } from '@/types'
+import { Override, UI_Props, UI_Status } from '@/types'
+import Button from './ui/Button'
 
-type UIState = '' | 'warning' | 'success' | 'error'
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/i
 const LS_SUGGESTIONS_KEY = 'recent_emails'
 const MAX_RECENT = 5
@@ -40,7 +40,7 @@ function saveSuggestion(email: string) {
    } catch {}
 }
 
-interface CustomProps {
+interface CustomProps extends UI_Props {
    initialEmail?: string
    onSubmit?: (email: string) => Promise<AuthResponse>
    onNext?: () => void
@@ -58,7 +58,7 @@ const EmailInput = forwardRef<HTMLInputElement, Props>((props, ref) => {
    // IMPORTANT: SSR-safe initial value (no sessionStorage read here)
    const [email, setEmail] = useState<string>(normalizeEmail(initialEmail))
    const [sending, setSending] = useState(false)
-   const [state, setState] = useState<UIState>('')
+   const [state, setState] = useState<UI_Status>('')
    const [stateKey, setStateKey] = useState<string>('') // translation key
 
    const canSubmit = useMemo(() => isEmailValid(email), [email])
@@ -130,6 +130,9 @@ const EmailInput = forwardRef<HTMLInputElement, Props>((props, ref) => {
                id="email"
                ref={ref}
                className="control"
+               data-tone={uiStatusToColor(state)}
+               data-variant="outline"
+               data-size="l"
                type="email"
                inputMode="email"
                autoCapitalize="none"
@@ -140,7 +143,6 @@ const EmailInput = forwardRef<HTMLInputElement, Props>((props, ref) => {
                value={email}
                onChange={(e) => setEmail(normalizeEmail(e.target.value))}
                list="recent-emails"
-               data-state={state}
                disabled={sending}
             />
             <datalist id="recent-emails">
@@ -149,16 +151,15 @@ const EmailInput = forwardRef<HTMLInputElement, Props>((props, ref) => {
                ))}
             </datalist>
 
-            <button
+            <Button
                type="submit"
-               className="control"
                disabled={!canSubmit || sending}
                aria-busy={sending}
                data-state={state}
             >
                {cap(g('next'))}
                <NextIcon />
-            </button>
+            </Button>
          </div>
 
          {stateKey && (

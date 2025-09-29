@@ -1,9 +1,0 @@
-/* /styles/components/search-box.css */
-@layer components {
-   .search-box {
-      width: 50vw;
-      max-width: 280px;
-      min-width: 180px;
-      position: relative; /* parent for absolute dropdown */
-   }
-}

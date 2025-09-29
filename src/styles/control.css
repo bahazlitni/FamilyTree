@@ -1,0 +1,440 @@
+@layer components {
+   /* ----------------------------------------
+      CONTROL BASE (shared geometry & resolve)
+      ---------------------------------------- */
+   :where(.control) {
+      /* resolved per-state colors (computed below) */
+      --ctrl-bg: transparent;
+      --ctrl-fg: currentColor;
+      --ctrl-bd: transparent;
+      --ctrl-ring: currentColor;
+
+      position: relative;
+      box-sizing: border-box;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+
+      font: inherit;
+      font-weight: 500;
+      line-height: 1;
+
+      border-style: solid;
+      border-width: 1px;
+      border-radius: 8px;
+
+      transition: background-color 0.15s, color 0.15s, border-color 0.15s,
+         box-shadow 0.15s;
+
+      background: var(--ctrl-bg);
+      color: var(--ctrl-fg);
+      border-color: var(--ctrl-bd);
+   }
+
+   /* height-locked sizes */
+   .control:not(ul.control)[data-size='s'] {
+      height: 28px;
+      font-size: 12px;
+      padding-inline: 8px;
+   }
+   .control:not(ul.control)[data-size='m'] {
+      height: 32px;
+      font-size: 13px;
+      padding-inline: 10px;
+   }
+   .control:not(ul.control)[data-size='l'] {
+      height: 36px;
+      font-size: 14px;
+      padding-inline: 12px;
+   }
+   .control:not(ul.control)[data-size='xl'] {
+      height: 40px;
+      font-size: 15px;
+      padding-inline: 12px;
+   }
+   .control:not(ul.control)[data-size='xxl'] {
+      height: 48px;
+      font-size: 16px;
+      padding-inline: 14px;
+   }
+
+   /* ----------------------------------------
+      TONE → LOCAL PALETTE MAP
+      We copy the chosen color family into --c0..--c11,
+      so state formulas can stay generic.
+      ---------------------------------------- */
+   /* default tone = gray (when data-tone omitted) */
+   .control {
+      --c0: var(--fill-0);
+      --c1: var(--fill-1);
+      --c2: var(--fill-2);
+      --c3: var(--fill-3);
+      --c4: var(--fill-4);
+      --c5: var(--fill-5);
+      --c6: var(--fill-6);
+      --c7: var(--fill-7);
+      --c8: var(--fill-8);
+      --c9: var(--fill-9);
+      --c10: var(--fill-10);
+      --c11: var(--fill-11);
+   }
+   .control[data-tone='gray'] {
+      --c0: var(--gray-0);
+      --c1: var(--gray-1);
+      --c2: var(--gray-2);
+      --c3: var(--gray-3);
+      --c4: var(--gray-4);
+      --c5: var(--gray-5);
+      --c6: var(--gray-6);
+      --c7: var(--gray-7);
+      --c8: var(--gray-8);
+      --c9: var(--gray-9);
+      --c10: var(--gray-10);
+      --c11: var(--gray-11);
+   }
+   .control[data-tone='blue'] {
+      --c0: var(--blue-0);
+      --c1: var(--blue-1);
+      --c2: var(--blue-2);
+      --c3: var(--blue-3);
+      --c4: var(--blue-4);
+      --c5: var(--blue-5);
+      --c6: var(--blue-6);
+      --c7: var(--blue-7);
+      --c8: var(--blue-8);
+      --c9: var(--blue-9);
+      --c10: var(--blue-10);
+      --c11: var(--blue-11);
+   }
+   .control[data-tone='red'] {
+      --c0: var(--red-0);
+      --c1: var(--red-1);
+      --c2: var(--red-2);
+      --c3: var(--red-3);
+      --c4: var(--red-4);
+      --c5: var(--red-5);
+      --c6: var(--red-6);
+      --c7: var(--red-7);
+      --c8: var(--red-8);
+      --c9: var(--red-9);
+      --c10: var(--red-10);
+      --c11: var(--red-11);
+   }
+   .control[data-tone='green'] {
+      --c0: var(--green-0);
+      --c1: var(--green-1);
+      --c2: var(--green-2);
+      --c3: var(--green-3);
+      --c4: var(--green-4);
+      --c5: var(--green-5);
+      --c6: var(--green-6);
+      --c7: var(--green-7);
+      --c8: var(--green-8);
+      --c9: var(--green-9);
+      --c10: var(--green-10);
+      --c11: var(--green-11);
+   }
+   .control[data-tone='yellow'] {
+      --c0: var(--yellow-0);
+      --c1: var(--yellow-1);
+      --c2: var(--yellow-2);
+      --c3: var(--yellow-3);
+      --c4: var(--yellow-4);
+      --c5: var(--yellow-5);
+      --c6: var(--yellow-6);
+      --c7: var(--yellow-7);
+      --c8: var(--yellow-8);
+      --c9: var(--yellow-9);
+      --c10: var(--yellow-10);
+      --c11: var(--yellow-11);
+   }
+   .control[data-tone='orange'] {
+      --c0: var(--orange-0);
+      --c1: var(--orange-1);
+      --c2: var(--orange-2);
+      --c3: var(--orange-3);
+      --c4: var(--orange-4);
+      --c5: var(--orange-5);
+      --c6: var(--orange-6);
+      --c7: var(--orange-7);
+      --c8: var(--orange-8);
+      --c9: var(--orange-9);
+      --c10: var(--orange-10);
+      --c11: var(--orange-11);
+   }
+   .control[data-tone='cyan'] {
+      --c0: var(--cyan-0);
+      --c1: var(--cyan-1);
+      --c2: var(--cyan-2);
+      --c3: var(--cyan-3);
+      --c4: var(--cyan-4);
+      --c5: var(--cyan-5);
+      --c6: var(--cyan-6);
+      --c7: var(--cyan-7);
+      --c8: var(--cyan-8);
+      --c9: var(--cyan-9);
+      --c10: var(--cyan-10);
+      --c11: var(--cyan-11);
+   }
+   .control[data-tone='purple'] {
+      --c0: var(--purple-0);
+      --c1: var(--purple-1);
+      --c2: var(--purple-2);
+      --c3: var(--purple-3);
+      --c4: var(--purple-4);
+      --c5: var(--purple-5);
+      --c6: var(--purple-6);
+      --c7: var(--purple-7);
+      --c8: var(--purple-8);
+      --c9: var(--purple-9);
+      --c10: var(--purple-10);
+      --c11: var(--purple-11);
+   }
+   .control[data-tone='magenta'] {
+      --c0: var(--magenta-0);
+      --c1: var(--magenta-1);
+      --c2: var(--magenta-2);
+      --c3: var(--magenta-3);
+      --c4: var(--magenta-4);
+      --c5: var(--magenta-5);
+      --c6: var(--magenta-6);
+      --c7: var(--magenta-7);
+      --c8: var(--magenta-8);
+      --c9: var(--magenta-9);
+      --c10: var(--magenta-10);
+      --c11: var(--magenta-11);
+   }
+
+   /* ----------------------------------------
+      VARIANT STYLE MAPS (per-state color picks)
+      All in terms of local --c* / --c* only.
+      ---------------------------------------- */
+
+   /* DEFAULT = secondary (good general control look) */
+   .control {
+      --bg-idle: var(--c2);
+      --bg-hover: var(--c3);
+      --bg-active: var(--c4);
+      --bg-focus: var(--c3);
+
+      --fg-idle: var(--c10);
+      --fg-hover: var(--c10);
+      --fg-active: var(--c11);
+      --fg-focus: var(--c11);
+
+      --bd-idle: var(--c5);
+      --bd-hover: var(--c6);
+      --bd-active: var(--c6);
+      --bd-focus: var(--c6);
+
+      --border-width: 1px;
+   }
+
+   /* PRIMARY = strongest filled */
+   .control[data-variant='primary'] {
+      --bg-idle: var(--c8);
+      --bg-hover: var(--c9);
+      --bg-active: var(--c10);
+      --bg-focus: var(--c9);
+
+      --fg-idle: var(--fill-11);
+      --fg-hover: var(--fill-11);
+      --fg-active: var(--fill-11);
+      --fg-focus: var(--fill-11);
+
+      --bd-idle: var(--c8);
+      --bd-hover: var(--c9);
+      --bd-active: var(--c10);
+      --bd-focus: var(--c9);
+
+      --border-width: 0; /* solid fill look */
+      font-weight: bold;
+   }
+
+   /* SOFT = faint tint (great for inputs) */
+   .control[data-variant='soft'] {
+      --bg-idle: var(--c0);
+      --bg-hover: var(--c1);
+      --bg-active: var(--c1);
+      --bg-focus: var(--c1);
+
+      --fg-idle: var(--c10);
+      --fg-hover: var(--c10);
+      --fg-active: var(--c11);
+      --fg-focus: var(--c11);
+
+      --bd-idle: var(--c5);
+      --bd-hover: var(--c6);
+      --bd-active: var(--c6);
+      --bd-focus: var(--c6);
+
+      --border-width: 1px;
+   }
+
+   /* OUTLINE = neutral bg, colored border + text */
+   .control[data-variant='outline'] {
+      --bg-idle: var(--c1);
+      --bg-hover: var(--c2);
+      --bg-active: var(--c3);
+      --bg-focus: var(--c2);
+
+      --fg-idle: var(--c10);
+      --fg-hover: var(--c10);
+      --fg-active: var(--c10);
+      --fg-focus: var(--c10);
+
+      --bd-idle: var(--c7);
+      --bd-hover: var(--c8);
+      --bd-active: var(--c9);
+      --bd-focus: var(--c8);
+
+      --border-width: 1px;
+   }
+
+   .control[data-variant='hyperlink'] {
+      /* neutralize control chrome */
+      --bg-idle: transparent;
+      --bg-hover: transparent;
+      --bg-active: transparent;
+      --bg-focus: transparent;
+
+      --bd-idle: transparent;
+      --bd-hover: transparent;
+      --bd-active: transparent;
+      --bd-focus: transparent;
+
+      /* link color pulls from tone ramp */
+      --fg-idle: var(--blue-9);
+      --fg-hover: var(--blue-10);
+      --fg-active: var(--blue-11);
+      --fg-focus: var(--blue-10);
+
+      --border-width: 0;
+
+      /* inline link look */
+      background: none;
+      border: 0;
+      color: var(--fg-idle);
+      padding: 0;
+      height: auto; /* opt out of height lock */
+      line-height: 1.15;
+      display: inline; /* opt out of inline-flex box */
+      vertical-align: baseline;
+      font-weight: 500;
+      cursor: pointer;
+      text-decoration: none;
+      text-underline-offset: 0.15em;
+   }
+
+   .control[role='otp-box'] {
+      justify-content: center;
+      text-align: center !important;
+      font-size: 24px !important;
+      border: none !important;
+      max-width: 52px;
+      height: auto;
+      flex: 1;
+      border-bottom-width: 2px !important;
+      border-bottom-style: solid !important;
+      aspect-ratio: 1/1;
+      user-select: text;
+      overflow: hidden;
+   }
+
+   /* Hover/active states */
+   .control[data-variant='hyperlink']:hover {
+      color: var(--fg-hover);
+      text-decoration: underline;
+   }
+   .control[data-variant='hyperlink']:active {
+      color: var(--fg-active);
+      text-decoration-thickness: 0.14em;
+   }
+
+   /* Focus-visible ring (keyboard) */
+   .control[data-variant='hyperlink']:focus-visible {
+      outline: 2px solid color-mix(in oklch, var(--c9) 55%, transparent);
+      outline-offset: 2px;
+      border-radius: 4px; /* small cushion around text */
+      text-decoration: underline;
+   }
+
+   /* Visited color for real anchors only */
+   a.control[data-variant='hyperlink']:visited {
+      color: color-mix(in oklch, var(--fg-idle) 80%, var(--c7));
+   }
+
+   /* Disabled (aria-disabled for a11y) */
+   .control[data-variant='hyperlink'][aria-disabled='true'] {
+      color: color-mix(in oklch, var(--fg-idle) 45%, var(--c6));
+      text-decoration: none;
+      cursor: not-allowed;
+      pointer-events: none;
+   }
+
+   /* Optional: external links styling */
+   a.control[data-variant='hyperlink'][target='_blank']::after {
+      content: '↗';
+      margin-inline-start: 0.25em;
+      font-size: 0.9em;
+      opacity: 0.85;
+   }
+
+   /* GHOST = transparent-ish bg, colored text, no border */
+   .control[data-variant='ghost'],
+   p.control {
+      --bg-idle: transparent;
+      --bg-hover: var(--c2);
+      --bg-active: var(--c3);
+      --bg-focus: var(--c2);
+
+      --fg-idle: var(--c10);
+      --fg-hover: var(--c10);
+      --fg-active: var(--c10);
+      --fg-focus: var(--c10);
+
+      --bd-idle: transparent;
+      --bd-hover: transparent;
+      --bd-active: transparent;
+      --bd-focus: transparent;
+
+      --border-width: 0;
+   }
+
+   /* Disabled overrides common to all variants */
+   .control:disabled {
+      --bg-idle: var(--c2);
+      --fg-idle: var(--c8);
+      --bd-idle: var(--c3);
+      opacity: 0.66;
+   }
+
+   /* ----------------------------------------
+      STATE RESOLUTION (maps to computed vars)
+      ---------------------------------------- */
+   .control {
+      --bg: var(--bg-idle);
+      --fg: var(--fg-idle);
+      --bd: var(--bd-idle);
+   }
+   .control:disabled {
+      --bg: var(--bg-idle);
+      --fg: var(--fg-idle);
+      --bd: var(--bd-idle);
+   }
+
+   /* apply resolved */
+   .control {
+      background: var(--bg);
+      color: var(--fg);
+      border-color: var(--bd);
+      border-width: var(--border-width, 1px);
+   }
+
+   @media (prefers-reduced-motion: reduce) {
+      .control {
+         transition: none;
+      }
+   }
+}

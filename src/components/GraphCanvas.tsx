@@ -8,7 +8,7 @@ import { nodeTypes as NODE_TYPES } from '@/components/nodeTypes'
 import { edgeTypes as EDGE_TYPES } from '@/components/edgeTypes'
 
 import { EPCID } from '@/lib/utils'
-import SearchBox from '@/components/SearchBox'
+import SearchBox from '@/components/ui/SearchBox'
 import { MdFitScreen } from 'react-icons/md'
 
 import PersonPanel from './PersonPanel'
@@ -23,6 +23,8 @@ import KinshipToolUI from '@/components/KinshipToolUI'
 
 import { useUIActions, useUIState } from '@/contexts/UIStateContext'
 import ThemeToggleButton from './ThemeToggleButton'
+import Button from '@/components/ui/Button'
+import { usePersonSearch } from '@/hooks/usePersonSearch'
 
 /* ----------------------- Helpers: sets & ancestry ----------------------- */
 
@@ -296,20 +298,32 @@ export default function GraphCanvas({ appGraph }: { appGraph: AppGraph }) {
       requestFocus(undefined)
    }, [ui.mode, clearSelection, requestFocus])
 
-   return (
-      <div className="canvas">
-         <div className="canvas-toolbar">
-            <SearchBox limit={30} placeholder={tCanvas('search-placeholder')} />
+   const { searchIds } = usePersonSearch()
 
-            <button className="control" onClick={handleFit}>
+   return (
+      <div className="react-flow">
+         <div className="react-flow-toolbar">
+            <SearchBox
+               onSearch={searchIds}
+               placeholder={tCanvas('search-placeholder')}
+               onSelect={(item?) => {
+                  if (item) requestFocus(item.id)
+               }}
+            />
+
+            <Button onClick={handleFit}>
                <MdFitScreen />
-            </button>
+            </Button>
 
             <ThemeToggleButton />
 
             <LanguageSwitcher />
 
-            {!appGraph.role ? <SignInButton /> : <SignOutButton />}
+            {!appGraph.role ? (
+               <SignInButton variant="ghost" tone="blue" />
+            ) : (
+               <SignOutButton variant="ghost" tone="blue" />
+            )}
          </div>
 
          <KinshipToolUI />

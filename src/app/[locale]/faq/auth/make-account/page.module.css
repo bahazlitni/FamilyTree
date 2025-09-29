@@ -1,29 +1,5 @@
 /* src/app/[locale]/faq/auth-make-account/page.module.css */
 
-.main {
-   display: grid;
-   place-items: start center;
-   padding: 24px;
-}
-.header {
-   border-bottom: 1px solid var(--border);
-   padding: 18px 20px;
-   display: flex;
-   flex-direction: column;
-   row-gap: 16px;
-}
-
-.row {
-   display: inline-flex;
-   column-gap: 8px;
-}
-
-.column {
-   display: flex;
-   flex-direction: column;
-   row-gap: 8px;
-}
-
 .panel {
    position: relative;
    max-width: 760px; /* wider than default panel */

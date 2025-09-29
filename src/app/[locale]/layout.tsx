@@ -7,6 +7,7 @@ import { routing } from '@/i18n/routing'
 import { ThemeProvider } from '@/contexts/ThemeContext'
 import { FocusProvider } from '@/contexts/FocusContext'
 import { Suspense } from 'react'
+import DirController from './DirController'
 
 export function generateStaticParams() {
    return routing.locales.map((locale) => ({ locale }))
@@ -26,14 +27,14 @@ export default async function LocaleLayout({
    setRequestLocale(locale)
 
    return (
-      <main dir={locale === 'ar' ? 'rtl' : 'ltr'}>
-         <NextIntlClientProvider>
-            <ThemeProvider>
-               <Suspense fallback={null}>
-                  <FocusProvider>{children}</FocusProvider>
-               </Suspense>
-            </ThemeProvider>
-         </NextIntlClientProvider>
-      </main>
+      <NextIntlClientProvider>
+         <DirController locale={locale} />
+
+         <ThemeProvider>
+            <Suspense fallback={null}>
+               <FocusProvider>{children}</FocusProvider>
+            </Suspense>
+         </ThemeProvider>
+      </NextIntlClientProvider>
    )
 }

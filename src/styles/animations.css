@@ -1,11 +1,16 @@
-/* /styles/variants/kinship-tool-ui.anim.css */
-@layer variants {
+@layer animations {
    @keyframes rotate360 {
       from {
          transform: rotate(0deg);
       }
       to {
          transform: rotate(360deg);
+      }
+   }
+
+   @keyframes dashmove {
+      to {
+         stroke-dashoffset: -30;
       }
    }
 }

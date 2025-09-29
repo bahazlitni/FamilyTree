@@ -1,0 +1,79 @@
+@layer reset {
+   html,
+   body {
+      width: 100%;
+      overflow-x: hidden;
+      transition: background-color 0.18s, color 0.18s, border-color 0.18s,
+         box-shadow 0.18s;
+   }
+
+   /* 1) Ensure the root actually sets direction */
+   html[dir='rtl'] {
+      direction: rtl;
+      unicode-bidi: isolate;
+   }
+   html[dir='ltr'] {
+      direction: ltr;
+      unicode-bidi: isolate;
+   }
+
+   body {
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto,
+         Arial, 'Noto Sans', 'Apple Color Emoji', 'Segoe UI Emoji';
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      background-color: var(--bg);
+      color: var(--fill-11);
+
+      display: flex;
+      flex-direction: column;
+   }
+
+   * {
+      box-sizing: border-box;
+      padding: 0;
+      margin: 0;
+      outline: 0;
+      border: 0;
+   }
+
+   a {
+      color: inherit;
+      text-decoration: none;
+   }
+
+   .row {
+      display: inline-flex;
+      column-gap: 8px;
+   }
+
+   .column {
+      display: flex;
+      flex-direction: column;
+      row-gap: 8px;
+   }
+
+   @media (prefers-color-scheme: dark) {
+      html {
+         color-scheme: dark;
+      }
+   }
+
+   /* scrollbars */
+   ::-webkit-scrollbar {
+      width: 10px;
+      height: 10px;
+   }
+   ::-webkit-scrollbar-thumb {
+      background: var(--fill-4);
+      border-radius: 10px;
+      border: 2px solid transparent;
+      background-clip: content-box;
+   }
+   ::-webkit-scrollbar-thumb:hover {
+      background: var(--fill-5);
+   }
+   ::-webkit-scrollbar-track {
+      background: transparent;
+   }
+}

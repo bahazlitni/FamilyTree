@@ -1,0 +1,323 @@
+@layer colors {
+   :root {
+      /* ======= Perceptual step schedule (for reference)
+        L steps (dark): 0.15,0.18,0.21,0.24,0.28,0.32,0.38,0.46,0.58,0.70,0.82,0.94
+        Chroma curve (chromatic ramps): 0.02,0.04,0.06,0.08,0.10,0.12,0.14,0.16,0.18,0.16,0.12,0.08
+        We keep H (hue) fixed per family.
+     ================================= */
+
+      /* ===========================
+        Neutral (fill) — dark (C=0)
+        =========================== */
+      --fill-0: oklch(0.15 0 0);
+      --fill-1: oklch(0.18 0 0);
+      --fill-2: oklch(0.21 0 0);
+      --fill-3: oklch(0.24 0 0);
+      --fill-4: oklch(0.28 0 0);
+      --fill-5: oklch(0.32 0 0);
+      --fill-6: oklch(0.38 0 0);
+      --fill-7: oklch(0.46 0 0);
+      --fill-8: oklch(0.58 0 0);
+      --fill-9: oklch(0.7 0 0);
+      --fill-10: oklch(0.82 0 0);
+      --fill-11: oklch(0.94 0 0);
+
+      /* ===========================
+        Gray (neutral grayscale) — dark (C=0)
+        Slightly different L track for separation from fill.
+        =========================== */
+      --gray-0: oklch(0.13 0 0);
+      --gray-1: oklch(0.16 0 0);
+      --gray-2: oklch(0.19 0 0);
+      --gray-3: oklch(0.22 0 0);
+      --gray-4: oklch(0.26 0 0);
+      --gray-5: oklch(0.3 0 0);
+      --gray-6: oklch(0.36 0 0);
+      --gray-7: oklch(0.44 0 0);
+      --gray-8: oklch(0.56 0 0);
+      --gray-9: oklch(0.68 0 0);
+      --gray-10: oklch(0.8 0 0);
+      --gray-11: oklch(0.93 0 0);
+
+      /* Helper chroma curve (explained above) */
+      /* c0..c11 used inline per ramp for clarity */
+
+      /* ===========================
+        Blue — dark (H≈255)
+        =========================== */
+      --blue-0: oklch(0.15 0.02 255);
+      --blue-1: oklch(0.18 0.04 255);
+      --blue-2: oklch(0.21 0.06 255);
+      --blue-3: oklch(0.24 0.08 255);
+      --blue-4: oklch(0.28 0.1 255);
+      --blue-5: oklch(0.32 0.12 255);
+      --blue-6: oklch(0.38 0.14 255);
+      --blue-7: oklch(0.46 0.16 255);
+      --blue-8: oklch(0.58 0.18 255);
+      --blue-9: oklch(0.7 0.16 255);
+      --blue-10: oklch(0.82 0.12 255);
+      --blue-11: oklch(0.94 0.08 255);
+
+      /* ===========================
+        Red — dark (H≈29)
+        =========================== */
+      --red-0: oklch(0.15 0.02 29);
+      --red-1: oklch(0.18 0.04 29);
+      --red-2: oklch(0.21 0.06 29);
+      --red-3: oklch(0.24 0.08 29);
+      --red-4: oklch(0.28 0.1 29);
+      --red-5: oklch(0.32 0.12 29);
+      --red-6: oklch(0.38 0.14 29);
+      --red-7: oklch(0.46 0.16 29);
+      --red-8: oklch(0.58 0.18 29);
+      --red-9: oklch(0.7 0.16 29);
+      --red-10: oklch(0.82 0.12 29);
+      --red-11: oklch(0.94 0.08 29);
+
+      /* ===========================
+        Green — dark (H≈142)
+        =========================== */
+      --green-0: oklch(0.15 0.02 142);
+      --green-1: oklch(0.18 0.04 142);
+      --green-2: oklch(0.21 0.06 142);
+      --green-3: oklch(0.24 0.08 142);
+      --green-4: oklch(0.28 0.1 142);
+      --green-5: oklch(0.32 0.12 142);
+      --green-6: oklch(0.38 0.14 142);
+      --green-7: oklch(0.46 0.16 142);
+      --green-8: oklch(0.58 0.18 142);
+      --green-9: oklch(0.7 0.16 142);
+      --green-10: oklch(0.82 0.12 142);
+      --green-11: oklch(0.94 0.08 142);
+
+      /* ===========================
+        Yellow — dark (H≈100, lower C at top end to avoid glare)
+        =========================== */
+      --yellow-0: oklch(0.15 0.02 100);
+      --yellow-1: oklch(0.18 0.04 100);
+      --yellow-2: oklch(0.21 0.06 100);
+      --yellow-3: oklch(0.24 0.08 100);
+      --yellow-4: oklch(0.28 0.1 100);
+      --yellow-5: oklch(0.32 0.12 100);
+      --yellow-6: oklch(0.38 0.14 100);
+      --yellow-7: oklch(0.46 0.16 100);
+      --yellow-8: oklch(0.58 0.16 100);
+      --yellow-9: oklch(0.7 0.14 100);
+      --yellow-10: oklch(0.82 0.1 100);
+      --yellow-11: oklch(0.94 0.06 100);
+
+      /* ===========================
+        Orange — dark (H≈70)
+        =========================== */
+      --orange-0: oklch(0.15 0.02 70);
+      --orange-1: oklch(0.18 0.04 70);
+      --orange-2: oklch(0.21 0.06 70);
+      --orange-3: oklch(0.24 0.08 70);
+      --orange-4: oklch(0.28 0.1 70);
+      --orange-5: oklch(0.32 0.12 70);
+      --orange-6: oklch(0.38 0.14 70);
+      --orange-7: oklch(0.46 0.16 70);
+      --orange-8: oklch(0.58 0.18 70);
+      --orange-9: oklch(0.7 0.16 70);
+      --orange-10: oklch(0.82 0.12 70);
+      --orange-11: oklch(0.94 0.08 70);
+
+      /* ===========================
+        Cyan — dark (H≈210)
+        =========================== */
+      --cyan-0: oklch(0.15 0.02 210);
+      --cyan-1: oklch(0.18 0.04 210);
+      --cyan-2: oklch(0.21 0.06 210);
+      --cyan-3: oklch(0.24 0.08 210);
+      --cyan-4: oklch(0.28 0.1 210);
+      --cyan-5: oklch(0.32 0.12 210);
+      --cyan-6: oklch(0.38 0.14 210);
+      --cyan-7: oklch(0.46 0.16 210);
+      --cyan-8: oklch(0.58 0.18 210);
+      --cyan-9: oklch(0.7 0.16 210);
+      --cyan-10: oklch(0.82 0.12 210);
+      --cyan-11: oklch(0.94 0.08 210);
+
+      /* ===========================
+        Magenta — dark (H≈330)
+        =========================== */
+      --magenta-0: oklch(0.15 0.02 330);
+      --magenta-1: oklch(0.18 0.04 330);
+      --magenta-2: oklch(0.21 0.06 330);
+      --magenta-3: oklch(0.24 0.08 330);
+      --magenta-4: oklch(0.28 0.1 330);
+      --magenta-5: oklch(0.32 0.12 330);
+      --magenta-6: oklch(0.38 0.14 330);
+      --magenta-7: oklch(0.46 0.16 330);
+      --magenta-8: oklch(0.58 0.18 330);
+      --magenta-9: oklch(0.7 0.16 330);
+      --magenta-10: oklch(0.82 0.12 330);
+      --magenta-11: oklch(0.94 0.08 330);
+
+      /* ===========================
+        Purple — dark (H≈280)
+        =========================== */
+      --purple-0: oklch(0.15 0.02 280);
+      --purple-1: oklch(0.18 0.04 280);
+      --purple-2: oklch(0.21 0.06 280);
+      --purple-3: oklch(0.24 0.08 280);
+      --purple-4: oklch(0.28 0.1 280);
+      --purple-5: oklch(0.32 0.12 280);
+      --purple-6: oklch(0.38 0.14 280);
+      --purple-7: oklch(0.46 0.16 280);
+      --purple-8: oklch(0.58 0.18 280);
+      --purple-9: oklch(0.7 0.16 280);
+      --purple-10: oklch(0.82 0.12 280);
+      --purple-11: oklch(0.94 0.08 280);
+
+      --bg: var(--fill-0);
+   }
+
+   /* ===========================
+      Light theme (flip ladders)
+      =========================== */
+   :root[data-theme='light'] {
+      /* Fill (achromatic) — light */
+      --fill-0: oklch(0.99 0 0);
+      --fill-1: oklch(0.96 0 0);
+      --fill-2: oklch(0.93 0 0);
+      --fill-3: oklch(0.9 0 0);
+      --fill-4: oklch(0.86 0 0);
+      --fill-5: oklch(0.82 0 0);
+      --fill-6: oklch(0.76 0 0);
+      --fill-7: oklch(0.68 0 0);
+      --fill-8: oklch(0.56 0 0);
+      --fill-9: oklch(0.44 0 0);
+      --fill-10: oklch(0.28 0 0);
+      --fill-11: oklch(0.16 0 0);
+
+      /* Gray (achromatic) — light */
+      --gray-0: oklch(0.98 0 0);
+      --gray-1: oklch(0.95 0 0);
+      --gray-2: oklch(0.92 0 0);
+      --gray-3: oklch(0.88 0 0);
+      --gray-4: oklch(0.84 0 0);
+      --gray-5: oklch(0.8 0 0);
+      --gray-6: oklch(0.74 0 0);
+      --gray-7: oklch(0.66 0 0);
+      --gray-8: oklch(0.54 0 0);
+      --gray-9: oklch(0.42 0 0);
+      --gray-10: oklch(0.3 0 0);
+      --gray-11: oklch(0.18 0 0);
+
+      /* For chromatic ramps we flip L and slightly tame high-end chroma */
+      /* Blue — light */
+      --blue-0: oklch(0.99 0.03 255);
+      --blue-1: oklch(0.96 0.05 255);
+      --blue-2: oklch(0.93 0.06 255);
+      --blue-3: oklch(0.9 0.08 255);
+      --blue-4: oklch(0.86 0.1 255);
+      --blue-5: oklch(0.82 0.12 255);
+      --blue-6: oklch(0.76 0.14 255);
+      --blue-7: oklch(0.68 0.16 255);
+      --blue-8: oklch(0.56 0.18 255);
+      --blue-9: oklch(0.44 0.16 255);
+      --blue-10: oklch(0.28 0.12 255);
+      --blue-11: oklch(0.16 0.08 255);
+
+      /* Red — light */
+      --red-0: oklch(0.99 0.03 29);
+      --red-1: oklch(0.96 0.05 29);
+      --red-2: oklch(0.93 0.06 29);
+      --red-3: oklch(0.9 0.08 29);
+      --red-4: oklch(0.86 0.1 29);
+      --red-5: oklch(0.82 0.12 29);
+      --red-6: oklch(0.76 0.14 29);
+      --red-7: oklch(0.68 0.16 29);
+      --red-8: oklch(0.56 0.18 29);
+      --red-9: oklch(0.44 0.16 29);
+      --red-10: oklch(0.28 0.12 29);
+      --red-11: oklch(0.16 0.08 29);
+
+      /* Green — light */
+      --green-0: oklch(0.99 0.03 142);
+      --green-1: oklch(0.96 0.05 142);
+      --green-2: oklch(0.93 0.06 142);
+      --green-3: oklch(0.9 0.08 142);
+      --green-4: oklch(0.86 0.1 142);
+      --green-5: oklch(0.82 0.12 142);
+      --green-6: oklch(0.76 0.14 142);
+      --green-7: oklch(0.68 0.16 142);
+      --green-8: oklch(0.56 0.18 142);
+      --green-9: oklch(0.44 0.16 142);
+      --green-10: oklch(0.28 0.12 142);
+      --green-11: oklch(0.16 0.08 142);
+
+      /* Yellow — light (top-end C lowered more) */
+      --yellow-0: oklch(0.99 0.02 100);
+      --yellow-1: oklch(0.96 0.04 100);
+      --yellow-2: oklch(0.93 0.05 100);
+      --yellow-3: oklch(0.9 0.07 100);
+      --yellow-4: oklch(0.86 0.09 100);
+      --yellow-5: oklch(0.82 0.11 100);
+      --yellow-6: oklch(0.76 0.13 100);
+      --yellow-7: oklch(0.68 0.15 100);
+      --yellow-8: oklch(0.56 0.16 100);
+      --yellow-9: oklch(0.44 0.14 100);
+      --yellow-10: oklch(0.28 0.1 100);
+      --yellow-11: oklch(0.16 0.06 100);
+
+      /* Orange — light */
+      --orange-0: oklch(0.99 0.03 70);
+      --orange-1: oklch(0.96 0.05 70);
+      --orange-2: oklch(0.93 0.06 70);
+      --orange-3: oklch(0.9 0.08 70);
+      --orange-4: oklch(0.86 0.1 70);
+      --orange-5: oklch(0.82 0.12 70);
+      --orange-6: oklch(0.76 0.14 70);
+      --orange-7: oklch(0.68 0.16 70);
+      --orange-8: oklch(0.56 0.18 70);
+      --orange-9: oklch(0.44 0.16 70);
+      --orange-10: oklch(0.28 0.12 70);
+      --orange-11: oklch(0.16 0.08 70);
+
+      /* Cyan — light */
+      --cyan-0: oklch(0.99 0.03 210);
+      --cyan-1: oklch(0.96 0.05 210);
+      --cyan-2: oklch(0.93 0.06 210);
+      --cyan-3: oklch(0.9 0.08 210);
+      --cyan-4: oklch(0.86 0.1 210);
+      --cyan-5: oklch(0.82 0.12 210);
+      --cyan-6: oklch(0.76 0.14 210);
+      --cyan-7: oklch(0.68 0.16 210);
+      --cyan-8: oklch(0.56 0.18 210);
+      --cyan-9: oklch(0.44 0.16 210);
+      --cyan-10: oklch(0.28 0.12 210);
+      --cyan-11: oklch(0.16 0.08 210);
+
+      /* Magenta — light */
+      --magenta-0: oklch(0.99 0.03 330);
+      --magenta-1: oklch(0.96 0.05 330);
+      --magenta-2: oklch(0.93 0.06 330);
+      --magenta-3: oklch(0.9 0.08 330);
+      --magenta-4: oklch(0.86 0.1 330);
+      --magenta-5: oklch(0.82 0.12 330);
+      --magenta-6: oklch(0.76 0.14 330);
+      --magenta-7: oklch(0.68 0.16 330);
+      --magenta-8: oklch(0.56 0.18 330);
+      --magenta-9: oklch(0.44 0.16 330);
+      --magenta-10: oklch(0.28 0.12 330);
+      --magenta-11: oklch(0.16 0.08 330);
+
+      /* Purple — light */
+      --purple-0: oklch(0.99 0.03 280);
+      --purple-1: oklch(0.96 0.05 280);
+      --purple-2: oklch(0.93 0.06 280);
+      --purple-3: oklch(0.9 0.08 280);
+      --purple-4: oklch(0.86 0.1 280);
+      --purple-5: oklch(0.82 0.12 280);
+      --purple-6: oklch(0.76 0.14 280);
+      --purple-7: oklch(0.68 0.16 280);
+      --purple-8: oklch(0.56 0.18 280);
+      --purple-9: oklch(0.44 0.16 280);
+      --purple-10: oklch(0.28 0.12 280);
+      --purple-11: oklch(0.16 0.08 280);
+
+      --bg: var(--fill-4);
+   }
+}

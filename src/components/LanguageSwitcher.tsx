@@ -1,19 +1,19 @@
 'use client'
 import { useLocale, useTranslations } from 'next-intl'
-import { Link } from '@/i18n/navigation'
 import { routing } from '@/i18n/routing'
 import { usePathname, useSearchParams } from 'next/navigation'
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useMemo } from 'react'
 import { cap } from '@/lib/utils'
-import { FiChevronDown } from 'react-icons/fi'
+import SelectBox, { type SelectItem } from '@/components/ui/SelectBox'
+import { useRouter } from '@/i18n/navigation' // next-intl-aware router
+import { UI_Props } from '@/types'
 
-export function LanguageSwitcher() {
+export function LanguageSwitcher({ variant, tone, size }: UI_Props) {
    const locale = useLocale()
    const t = useTranslations('languages')
    const pathname = usePathname()
    const searchParams = useSearchParams()
-   const [open, setOpen] = useState(false)
-   const rootRef = useRef<HTMLDivElement>(null)
+   const router = useRouter()
 
    // Strip current locale prefix from the pathname to build the target path.
    const hrefbase = useMemo(() => {
@@ -22,55 +22,37 @@ export function LanguageSwitcher() {
       return p === '' ? '/' : p
    }, [pathname, locale])
 
-   // Preserve ALL current query params (step, next, etc.)
+   // Preserve ALL current query params.
    const query = useMemo(
       () => Object.fromEntries(searchParams.entries()),
       [searchParams]
    )
 
-   // Close when clicking outside
-   useEffect(() => {
-      if (!open) return
-      const onPointerDown = (e: MouseEvent) => {
-         if (!rootRef.current) return
-         if (!rootRef.current.contains(e.target as Node)) setOpen(false)
-      }
-      document.addEventListener('pointerdown', onPointerDown)
-      return () => document.removeEventListener('pointerdown', onPointerDown)
-   }, [open])
+   // Build items from available locales
+   const items: SelectItem[] = useMemo(
+      () =>
+         routing.locales.map((l) => ({
+            id: l,
+            label: cap(t(l)),
+            disabled: l === locale, // optional: disable current one
+         })),
+      [locale, t]
+   )
 
    return (
-      <div ref={rootRef} style={{ position: 'relative' }}>
-         <button
-            className="control"
-            aria-haspopup="listbox"
-            aria-expanded={open}
-            onClick={() => setOpen((o) => !o)}
-         >
-            <p>{cap(t('language'))}</p>
-            <FiChevronDown />
-         </button>
-
-         {open && (
-            <ul className="control" data-variant="dropdown" role="listbox">
-               {routing.locales.map(
-                  (l) =>
-                     l !== locale && (
-                        <li key={l} role="option" aria-selected={l === locale}>
-                           <Link
-                              className="control"
-                              href={{ pathname: hrefbase, query }}
-                              locale={l}
-                              onClick={() => setOpen(false)}
-                              aria-current={l === locale ? 'page' : undefined}
-                           >
-                              {cap(t(l))}
-                           </Link>
-                        </li>
-                     )
-               )}
-            </ul>
-         )}
-      </div>
+      <SelectBox
+         items={items}
+         value={locale}
+         onSelect={(next) => {
+            if (!next || next === locale) return
+            // next-intl-aware navigation, keep path + query, change locale
+            router.push({ pathname: hrefbase, query }, { locale: next as any })
+         }}
+         variant={variant}
+         tone={tone}
+         size={size}
+         placeholder={cap(t('language'))}
+         aria-label={cap(t('language'))}
+      />
    )
 }
