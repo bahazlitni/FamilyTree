@@ -104,7 +104,7 @@ function buildBloodlineStringFromIds(
    locale: string,
    appGraph: ReturnType<typeof useAppGraph>['appGraph'],
    start: Person,
-   maxSteps = 10
+   maxSteps = 10,
 ): string | null {
    const graph = appGraph?.graph
    if (!graph || !start) return null
@@ -202,7 +202,7 @@ export default function PersonPanel({ open, data, onClose }: PersonPanelProps) {
    // Locale, dir, morph
    const locale = useLocale()
    const morph = getMorph(
-      (locale as string).startsWith('ar') ? 'ar' : (locale as any)
+      (locale as string).startsWith('ar') ? 'ar' : (locale as any),
    )
 
    useEffect(() => {
@@ -219,14 +219,14 @@ export default function PersonPanel({ open, data, onClose }: PersonPanelProps) {
    const spouses = Array.from(data.spouses ?? []).sort((a: Person, b: Person) =>
       (a.fullname ?? '')
          .toLowerCase()
-         .localeCompare((b.fullname ?? '').toLowerCase())
+         .localeCompare((b.fullname ?? '').toLowerCase()),
    )
 
    const children = Array.from(data.children ?? []).sort(
       (a: Person, b: Person) =>
          (a.fullname ?? '')
             .toLowerCase()
-            .localeCompare((b.fullname ?? '').toLowerCase())
+            .localeCompare((b.fullname ?? '').toLowerCase()),
    )
 
    const currentYear: number = new Date().getFullYear()
@@ -235,27 +235,27 @@ export default function PersonPanel({ open, data, onClose }: PersonPanelProps) {
          ? Math.max(
               0,
               (p.death_year !== null ? p.death_year : currentYear) -
-                 p.birth_year
+                 p.birth_year,
            )
          : null
 
    // Defaults: gender = 'male', count = 1
    const gender: Gender = useMemo(
       () => (p.is_male === false ? 'female' : 'male'),
-      [p]
+      [p],
    )
    const defaultCount = 1
 
    // Patrilineal bloodline string (via graph.bloodlineIdOf)
    const bloodline = useMemo(
       () => buildBloodlineStringFromIds(locale, appGraph, p, 10),
-      [locale, appGraph, p]
+      [locale, appGraph, p],
    )
 
    function joinWithPlace(
       datePart: string | null,
       place: string | null,
-      country: string | null
+      country: string | null,
    ) {
       const joint = tG(',') + ' '
       const placeStr = [place || null, country || null]
@@ -274,7 +274,7 @@ export default function PersonPanel({ open, data, onClose }: PersonPanelProps) {
          joinWithPlace(
             formatDateFull(locale, p.birth_year, p.birth_month, p.birth_day),
             translate('place', locale, appGraph, p.birth_place) ?? null,
-            translate('country', locale, appGraph, p.birth_country) ?? null
+            translate('country', locale, appGraph, p.birth_country) ?? null,
          ) || PRIVATE,
       death:
          formatDateFull(locale, p.death_year, p.death_month, p.death_day) ??
@@ -330,7 +330,7 @@ export default function PersonPanel({ open, data, onClose }: PersonPanelProps) {
                                  fullname={fullnameOf(
                                     locale,
                                     appGraph,
-                                    data.father
+                                    data.father,
                                  )}
                                  meta={tK('father')}
                               />
@@ -341,7 +341,7 @@ export default function PersonPanel({ open, data, onClose }: PersonPanelProps) {
                                  fullname={fullnameOf(
                                     locale,
                                     appGraph,
-                                    data.mother
+                                    data.mother,
                                  )}
                                  meta={tK('mother')}
                               />
@@ -388,7 +388,7 @@ export default function PersonPanel({ open, data, onClose }: PersonPanelProps) {
                      </Section>
                   )}
                   <p className="panelMeta">
-                     {`ID: ${formatPanelId(p.rawId)} | Spource Link: ${spouseLinksLabel}`}
+                     {`ID: ${formatPanelId(p.rawId)} | Spouse Link: ${spouseLinksLabel}`}
                   </p>
                </div>
             </motion.aside>
