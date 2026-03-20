@@ -1,4 +1,4 @@
-// middleware.ts (project root)
+// proxy.ts
 import createMiddleware from 'next-intl/middleware'
 
 // Keep in sync with your i18n/routing setup
@@ -10,8 +10,7 @@ export default createMiddleware({
    localePrefix: 'always',
 })
 
-// Ensure the middleware runs on both the root and all locale-prefixed paths
+// Ensure the proxy runs on both the root and all locale-prefixed paths
 export const config = {
-   // Next 15 (Turbopack) matcher style
    matcher: ['/', '/(en|ar)/:path*'],
 }
