@@ -54,6 +54,15 @@
       row-gap: 16px;
    }
 
+   .panel .panelMeta {
+      font-size: 11px;
+      color: var(--fill-8);
+      word-break: break-word;
+      border-top: 1px solid var(--fill-4);
+      padding-top: 12px;
+      margin-top: 4px;
+   }
+
    .panel .count {
       font-size: 11px;
       color: var(--blue-8);

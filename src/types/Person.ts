@@ -3,6 +3,7 @@ import { cap, isNil } from '@/lib/utils'
 
 export default class Person {
    public readonly id: string
+   public readonly rawId: string
    public readonly is_male: boolean | null
    public readonly firstname: string | null
    public readonly lastname: string | null
@@ -22,6 +23,7 @@ export default class Person {
 
    constructor(
       id: string,
+      rawId: string | number = id,
       is_male: boolean | null = null,
       firstname: string | null = null,
       lastname: string | null = null,
@@ -36,6 +38,7 @@ export default class Person {
       birth_country: string | null = null
    ) {
       this.id = id
+      this.rawId = String(rawId)
       this.is_male = is_male
       this.firstname = firstname ? cap(firstname) : null
       this.lastname = lastname ? cap(lastname) : null

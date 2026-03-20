@@ -29,18 +29,30 @@ export default class Graph {
       childRows: ChildLink[]
    ) {
       const PID = (x: string) => `P:${x}`
+      const appendUnique = (
+         map: Map<string, string[]>,
+         key: string,
+         value: string
+      ) => {
+         const list = map.get(key) ?? []
+         if (!list.includes(value)) list.push(value)
+         map.set(key, list)
+      }
 
       // transient locals
       const persons = new Map<string, Person>()
       const spousesByPerson = new Map<string, string[]>()
       const childrenByPerson = new Map<string, string[]>()
+      const spouseLinksByPerson = new Map<string, string[]>()
       const fatherByPerson = new Map<string, string>()
       const motherByPerson = new Map<string, string>()
 
       for (const r of personsRows) {
-         const id = PID(r.id)
+         const rawPersonId = String(r.id)
+         const id = PID(rawPersonId)
          const p = new Person(
             id,
+            rawPersonId,
             r.is_male ?? null,
             r.firstname?.trim() ?? null,
             r.lastname?.trim() ?? null,
@@ -60,37 +72,34 @@ export default class Graph {
       // map spouse link id → partners
       const linkPartners = new Map<string, { a?: string; b?: string }>()
       for (const r of spouseRows) {
-         const a = r.partner_a_id ? PID(r.partner_a_id) : undefined
-         const b = r.partner_b_id ? PID(r.partner_b_id) : undefined
+         const rawLinkId = String(r.id)
+         const a =
+            r.partner_a_id === null || r.partner_a_id === undefined
+               ? undefined
+               : PID(String(r.partner_a_id))
+         const b =
+            r.partner_b_id === null || r.partner_b_id === undefined
+               ? undefined
+               : PID(String(r.partner_b_id))
          if (a && b) {
-            const la = spousesByPerson.get(a) ?? []
-            const lb = spousesByPerson.get(b) ?? []
-            la.push(b)
-            lb.push(a)
-            spousesByPerson.set(a, la)
-            spousesByPerson.set(b, lb)
+            appendUnique(spousesByPerson, a, b)
+            appendUnique(spousesByPerson, b, a)
          }
-         linkPartners.set(PID(r.id), { a, b })
+         if (a) appendUnique(spouseLinksByPerson, a, rawLinkId)
+         if (b) appendUnique(spouseLinksByPerson, b, rawLinkId)
+         linkPartners.set(PID(rawLinkId), { a, b })
       }
 
       for (const r of childRows) {
-         const linkId = PID(r.spouse_link_id)
-         const childId = PID(r.child_id)
+         const linkId = PID(String(r.spouse_link_id))
+         const childId = PID(String(r.child_id))
          const partners = linkPartners.get(linkId)
          if (!partners) continue
          const a = partners.a
          const b = partners.b
 
-         if (a) {
-            const list = childrenByPerson.get(a) ?? []
-            list.push(childId)
-            childrenByPerson.set(a, list)
-         }
-         if (b) {
-            const list = childrenByPerson.get(b) ?? []
-            list.push(childId)
-            childrenByPerson.set(b, list)
-         }
+         if (a) appendUnique(childrenByPerson, a, childId)
+         if (b) appendUnique(childrenByPerson, b, childId)
 
          const aMale = a ? persons.get(a)?.is_male : null
          const bMale = b ? persons.get(b)?.is_male : null
@@ -111,6 +120,7 @@ export default class Graph {
          const mother = motherByPerson.get(id)
          const childIds = childrenByPerson.get(id) ?? []
          const spouseIds = spousesByPerson.get(id) ?? []
+         const spouseLinkIds = spouseLinksByPerson.get(id) ?? []
 
          const entry: PersonView = Object.freeze({
             person,
@@ -122,6 +132,7 @@ export default class Graph {
             spouses: Object.freeze(
                spouseIds.map((sid) => persons.get(sid)!).filter(Boolean)
             ),
+            spouseLinkIds: Object.freeze([...spouseLinkIds]),
          })
          this.__populated.set(id, entry)
       }

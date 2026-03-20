@@ -24,6 +24,11 @@ import { getMorph } from '@/i18n/morph'
 import { formatDateFull } from '@/i18n/formatDateFull'
 type Gender = 'male' | 'female' | 'other'
 
+function formatPanelId(id?: string | null) {
+   if (!id) return 'N/A'
+   return String(id).replace(/^P:/, '')
+}
+
 const PRIVATE = '—'
 
 /* ----------------------------- Subcomponents ----------------------------- */
@@ -263,7 +268,7 @@ export default function PersonPanel({ open, data, onClose }: PersonPanelProps) {
       firstname: firstnameOf(locale, appGraph, p, true),
       lastname: lastnameOf(locale, appGraph, p, true),
       fullname: fullnameOf(locale, appGraph, p),
-      age: age ? String(age) : PRIVATE,
+      age: age === null ? PRIVATE : String(age),
       gender: cap(tP(gender)),
       birth:
          joinWithPlace(
@@ -275,6 +280,8 @@ export default function PersonPanel({ open, data, onClose }: PersonPanelProps) {
          formatDateFull(locale, p.death_year, p.death_month, p.death_day) ??
          cap(morph.adjective.dead(gender, defaultCount)),
    }
+   const spouseLinksLabel =
+      data.spouseLinkIds.length > 0 ? data.spouseLinkIds.join(', ') : 'N/A'
 
    const dragOptions = {
       localStorageKeys: { x: 'panel-x', y: 'panel-y' },
@@ -314,27 +321,31 @@ export default function PersonPanel({ open, data, onClose }: PersonPanelProps) {
                      )}
                   </Section>
 
-                  {Boolean(data.father || data.mother) && (
+                  {(data.father || data.mother) && (
                      <Section title={tP('parents')}>
                         <div className="chips">
-                           <ButtonChip
-                              id={data.father?.id}
-                              fullname={fullnameOf(
-                                 locale,
-                                 appGraph,
-                                 data.father
-                              )}
-                              meta={tK('father')}
-                           />
-                           <ButtonChip
-                              id={data.mother?.id}
-                              fullname={fullnameOf(
-                                 locale,
-                                 appGraph,
-                                 data.mother
-                              )}
-                              meta={tK('mother')}
-                           />
+                           {data.father && (
+                              <ButtonChip
+                                 id={data.father.id}
+                                 fullname={fullnameOf(
+                                    locale,
+                                    appGraph,
+                                    data.father
+                                 )}
+                                 meta={tK('father')}
+                              />
+                           )}
+                           {data.mother && (
+                              <ButtonChip
+                                 id={data.mother.id}
+                                 fullname={fullnameOf(
+                                    locale,
+                                    appGraph,
+                                    data.mother
+                                 )}
+                                 meta={tK('mother')}
+                              />
+                           )}
                         </div>
                      </Section>
                   )}
@@ -376,6 +387,9 @@ export default function PersonPanel({ open, data, onClose }: PersonPanelProps) {
                         </ul>
                      </Section>
                   )}
+                  <p className="panelMeta">
+                     {`ID: ${formatPanelId(p.rawId)} | Spource Link: ${spouseLinksLabel}`}
+                  </p>
                </div>
             </motion.aside>
          )}

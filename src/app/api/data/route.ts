@@ -3,8 +3,19 @@ import { NextResponse } from 'next/server'
 import { createSupabaseServer } from '@/lib/supabase/client'
 import { getAppRole } from '@/lib/role'
 import { cookies } from 'next/headers'
+import type {
+   ChildLink,
+   PersonRow,
+   SpouseLink,
+   TranslationEntryRow,
+   TranslationTokenRow,
+} from '@/types'
 
 function parsePagination(searchParams: URLSearchParams) {
+   const hasPagination =
+      searchParams.has('limit') || searchParams.has('offset')
+   if (!hasPagination) return null
+
    const limit = Number(searchParams.get('limit') ?? '1000')
    const offset = Number(searchParams.get('offset') ?? '0')
    return {
@@ -13,9 +24,49 @@ function parsePagination(searchParams: URLSearchParams) {
    }
 }
 
+type SupabaseServerClient = Awaited<ReturnType<typeof createSupabaseServer>>
+type Pagination = ReturnType<typeof parsePagination>
+
+async function selectRows<T>(
+   supabase: SupabaseServerClient,
+   table: string,
+   pagination: Pagination
+): Promise<T[]> {
+   if (pagination) {
+      const { limit, offset } = pagination
+      const { data, error } = await supabase
+         .from(table)
+         .select('*')
+         .range(offset, offset + limit - 1)
+      if (error) throw error
+      return (data ?? []) as T[]
+   }
+
+   const pageSize = 1000
+   const rows: T[] = []
+   let offset = 0
+
+   while (true) {
+      const { data, error } = await supabase
+         .from(table)
+         .select('*')
+         .range(offset, offset + pageSize - 1)
+
+      if (error) throw error
+
+      const batch = (data ?? []) as T[]
+      rows.push(...batch)
+
+      if (batch.length < pageSize) break
+      offset += pageSize
+   }
+
+   return rows
+}
+
 export async function GET(req: Request) {
    const url = new URL(req.url)
-   const { limit, offset } = parsePagination(url.searchParams)
+   const pagination = parsePagination(url.searchParams)
 
    const supabase = await createSupabaseServer(cookies)
    const role = await getAppRole(supabase)
@@ -31,43 +82,33 @@ export async function GET(req: Request) {
             translation_tokens,
             translation_entries,
          ] = await Promise.all([
-            supabase
-               .from(`persons_${view_category}_view`)
-               .select('*')
-               .range(offset, offset + limit - 1),
-            supabase
-               .from('spouse_links_view')
-               .select('*')
-               .range(offset, offset + limit - 1),
-            supabase
-               .from('child_links_view')
-               .select('*')
-               .range(offset, offset + limit - 1),
-            supabase
-               .from(`translation_tokens_${view_category}_view`)
-               .select('*')
-               .range(offset, offset + limit - 1),
-            supabase
-               .from(`translation_entries_${view_category}_view`)
-               .select('*')
-               .range(offset, offset + limit - 1),
+            selectRows<PersonRow>(
+               supabase,
+               `persons_${view_category}_view`,
+               pagination
+            ),
+            selectRows<SpouseLink>(supabase, 'spouse_links_view', pagination),
+            selectRows<ChildLink>(supabase, 'child_links_view', pagination),
+            selectRows<TranslationTokenRow>(
+               supabase,
+               `translation_tokens_${view_category}_view`,
+               pagination
+            ),
+            selectRows<TranslationEntryRow>(
+               supabase,
+               `translation_entries_${view_category}_view`,
+               pagination
+            ),
          ])
-         const err =
-            persons.error ||
-            spouseLinks.error ||
-            childLinks.error ||
-            translation_tokens.error ||
-            translation_entries.error
-         if (err) throw err
 
          return NextResponse.json({
             role,
             data: {
-               translation_tokens: translation_tokens.data,
-               translation_entries: translation_entries.data,
-               persons: persons.data,
-               spouse_links: spouseLinks.data,
-               child_links: childLinks.data,
+               translation_tokens,
+               translation_entries,
+               persons,
+               spouse_links: spouseLinks,
+               child_links: childLinks,
             },
          })
       }
@@ -80,49 +121,31 @@ export async function GET(req: Request) {
          translation_tokens,
          translation_entries,
       ] = await Promise.all([
-         supabase
-            .from('persons')
-            .select('*')
-            .range(offset, offset + limit - 1),
-         supabase
-            .from('spouse_links')
-            .select('*')
-            .range(offset, offset + limit - 1),
-         supabase
-            .from('child_links')
-            .select('*')
-            .range(offset, offset + limit - 1),
-         supabase
-            .from('control')
-            .select('*')
-            .range(offset, offset + limit - 1),
-         supabase
-            .from('translation_tokens')
-            .select('*')
-            .range(offset, offset + limit - 1),
-         supabase
-            .from('translation_entries')
-            .select('*')
-            .range(offset, offset + limit - 1),
+         selectRows<PersonRow>(supabase, 'persons', pagination),
+         selectRows<SpouseLink>(supabase, 'spouse_links', pagination),
+         selectRows<ChildLink>(supabase, 'child_links', pagination),
+         selectRows<Record<string, unknown>>(supabase, 'control', pagination),
+         selectRows<TranslationTokenRow>(
+            supabase,
+            'translation_tokens',
+            pagination
+         ),
+         selectRows<TranslationEntryRow>(
+            supabase,
+            'translation_entries',
+            pagination
+         ),
       ])
-      const err =
-         persons.error ||
-         spouseLinks.error ||
-         childLinks.error ||
-         control.error ||
-         translation_tokens.error ||
-         translation_entries.error
-      if (err) throw err
 
       return NextResponse.json({
          role,
          data: {
-            persons: persons.data,
-            spouse_links: spouseLinks.data,
-            child_links: childLinks.data,
-            control: control.data,
-            translation_tokens: translation_tokens.data,
-            translation_entries: translation_entries.data,
+            persons,
+            spouse_links: spouseLinks,
+            child_links: childLinks,
+            control,
+            translation_tokens,
+            translation_entries,
          },
       })
    } catch (e: any) {

@@ -98,6 +98,7 @@ export interface PersonView {
    mother?: Person
    children: ReadonlyArray<Person>
    spouses: ReadonlyArray<Person>
+   spouseLinkIds: ReadonlyArray<string>
 }
 
 export type KinshipRelationType =
